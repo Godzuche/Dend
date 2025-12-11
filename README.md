@@ -1,8 +1,8 @@
 # DenD - Your Personal Call Firewall
 
-**Stop unwanted calls. Reclaim your peace.** DenD gives you simple, powerful control to decide exactly who can and cannot make your phone ring.![GitHub last commit](https://img.shields.io/github/last-commit/Godzuche/DenD?style=for-the-badge)
-![GitHub repo size](https://img.shields.io/github/repo-size/Godzuche/DenD?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/Godzuche/DenD?style=for-the-badge)
+**Stop unwanted calls. Reclaim your peace.** DenD gives you simple, powerful control to decide exactly who can and cannot make your phone ring.![GitHub last commit](https://img.shields.io/github/last-commit/Godzuche/Dend?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/Godzuche/Dend?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/Godzuche/Dend?style=for-the-badge)
 
 ---
 
