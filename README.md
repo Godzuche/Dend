@@ -29,6 +29,8 @@ That exact frustration is why DenD was built. It's a lightweight, open-source An
 This project is actively being developed. Our goal is to create the most respectful and powerful call management tool for Android.
 
 - [ ] **Intelligent Spam Detection:** Automatically block known spam and scam numbers.
+- [ ] **Automated SMS Replies:**
+      Optionally send an automatic text message when a call is blocked. This will be highly configurable, with support for a general message and custom messages for specific numbers.
 - [ ] **Custom Firewall Rules:** Block calls based on patterns (e.g., hidden or international numbers).
 - [ ] **Firewall Log:** View a history of all the calls your firewall has blocked for you.
 - [ ] **Temporary Pass:** Grant a one-time pass to a blocked number to call you back.
@@ -58,4 +60,3 @@ This project was born from a personal need and brought to life by incredible ope
 
 -   A special thanks to the **Jetpack Compose team at Google**. Their work has made building beautiful, modern Android UIs a true joy.
 -   This app is a direct answer to the frustration of being kicked from a game or having a meeting interrupted by a call that also kills the phone's data connection (on non-VoLTE networks). It's dedicated to everyone else who just wants to maintain their focus and their flow.
-
