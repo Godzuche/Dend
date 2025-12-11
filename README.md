@@ -1,5 +1,6 @@
 # DenD – Block Calls, Not Connections.
 
+[//]: # (Todo: Add Feature - Set Automatic Routines for different firewall modes)
 Ever been in the middle of a game, a meeting, or focused work, only to have an unwanted call not only interrupt you but also kill your phone's internet connection?
 
 That exact frustration is why DenD was built. It's a lightweight, open-source Android app that acts as a personal firewall for your calls, giving you back your focus and your data connection. It allows you to create simple but powerful rules to ensure that only the people you want to hear from can make your phone ring.
