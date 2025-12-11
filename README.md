@@ -1,29 +1,25 @@
-# Dend
+# DenD - Your Personal Call Firewall
 
-**Dend: Your personal firewall for phone calls.**
-
-Take back control of your phone with a simple, powerful call screener. DeeNDee lets you define your own rules to instantly block unwanted calls, ensuring your peace and quiet is never disturbed.
-
-![GitHub last commit](https://img.shields.io/github/last-commit/your-username/deendee?style=for-the-badge)
-![GitHub repo size](https://img.shields.io/github/repo-size/your-username/deendee?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/your-username/deendee?style=for-the-badge)
+**Stop unwanted calls. Reclaim your peace.** DenD gives you simple, powerful control to decide exactly who can and cannot make your phone ring.![GitHub last commit](https://img.shields.io/github/last-commit/Godzuche/DenD?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/Godzuche/DenD?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/Godzuche/DenD?style=for-the-badge)
 
 ---
 
-## ✨ Core Features
+## Core Features
 
-DeeNDee uses the official Android `CallScreeningService` API to give you seamless and robust control over incoming calls.
+DenD uses Android's official `CallScreeningService` API to give you a secure and seamless firewall for your calls.
 
-*   🚫 **Personal Blacklist:** Add any number to your block list. They will be rejected instantly and silently, without ever ringing.
-*   ✅ **Personal Whitelist:** Create a list of approved numbers (family, friends, work) that can always reach you, no matter what.
-*   🧘 **Block All Mode (Zen Mode):** With a single tap, block all incoming calls that aren't on your whitelist. Perfect for meetings, focused work, or when you just need a break from the world.
-*   🧹 **Clean & Seamless:** Blocked calls don't appear as "missed calls" in your phone's history. No ring, no notification, no clutter. Just silence.
+*   **Build Your Blocklist:** Add any number to your personal blacklist. They will be rejected instantly and silently, without ever disturbing you.
+*   **Define Your VIPs:** Create a whitelist of approved numbers (family, friends, work). These calls will always get through, no matter what.
+*   **Zen Mode:** With a single tap, activate the ultimate firewall. This mode blocks all incoming calls that aren't on your whitelist, guaranteeing you absolute focus and quiet.
+*   **Clean & Invisible:** Blocked calls don't leave "missed call" notifications and won't clutter your phone's history. No ring, no notification, no mess.
 
-## 🧠 Philosophy
+## Philosophy
 
-Your phone should be a tool that serves you, not a source of constant interruption. DeeNDee is built on a simple principle: **you decide who gets your attention.** We started with the most important feature—giving you absolute manual control—as the foundation for a smarter, more respectful calling experience.
+Your phone should be a tool that serves you, not a source of constant interruption. DenD is built on a simple principle: **you are the gatekeeper.** We started with the most important feature—giving you absolute manual control—as the foundation for a smarter, more respectful calling experience.
 
-## 🛠️ Built With
+## Built With
 
 *   [**Kotlin**](https://kotlinlang.org/): The primary language for modern Android development.
 *   [**Jetpack Compose**](https://developer.android.com/jetpack/compose): For building a beautiful, reactive, and modern UI.
@@ -31,16 +27,16 @@ Your phone should be a tool that serves you, not a source of constant interrupti
 *   **Coroutines & Flow:** For asynchronous operations and managing data streams.
 *   **Material 3:** Following the latest design guidelines from Google.
 
-## 🚀 Roadmap: What's Next?
+## Roadmap: What's Next?
 
-DeeNDee is actively being developed. Our vision is to build the most respectful and powerful call management tool for Android.
+DenD is actively being developed. Our vision is to evolve this personal firewall into an intelligent guardian for your calls.
 
 - [ ] **Intelligent Spam Detection:** Automatically block known spam and scam numbers using a community-powered or global database.
-- [ ] **Customizable Rules:** Block calls based on patterns (e.g., all international numbers, all hidden numbers).
-- [ ] **Statistics & History:** View a log of all the calls DeeNDee has blocked for you.
-- [ ] **Temporary "Pass":** Allow a blocked number to call you back within a short time window (e.g., for delivery services).
+- [ ] **Customizable Firewall Rules:** Block calls based on patterns (e.g., all international numbers, all hidden numbers).
+- [ ] **Firewall Log:** View a history of all the calls your firewall has blocked for you.
+- [ ] **Temporary Pass:** Grant a one-time pass to a blocked number, allowing them to call you back within a short time window (e.g., for delivery services).
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -54,8 +50,6 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 Don't forget to give the project a star! Thanks again!
 
-## 📄 License
+## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
----
+Distributed under the **Apache License 2.0**. See `LICENSE.txt` for more information.
