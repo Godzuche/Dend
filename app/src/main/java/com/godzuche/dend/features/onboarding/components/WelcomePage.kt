@@ -34,21 +34,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.godzuche.dend.R
 import com.godzuche.dend.ui.theme.DendTheme
 
-//@Composable
-//fun WelcomePage(modifier: Modifier = Modifier) {
-//    Column() {
-//        Text(
-//            text = "Welcome to DenD"
-//        )
-//
-//        Text(
-//            text = "Take back your focus by blocking unwanted calls."
-//        )
-//    }
-//}
-
 @Composable
-fun WelcomeScreen(
+fun WelcomePage(
     onGetStartedClick: () -> Unit
 ) {
     var startAnimation by remember { mutableStateOf(false) }
@@ -122,17 +109,10 @@ fun WelcomeScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun WelcomeScreenPreview() {
+private fun WelcomePagePreview() {
     DendTheme {
-        WelcomeScreen(
+        WelcomePage(
             onGetStartedClick = {}
         )
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun WelcomePagePreview() = DendTheme{
-//    WelcomePage()
-//}

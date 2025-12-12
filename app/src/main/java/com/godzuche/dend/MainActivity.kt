@@ -23,7 +23,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
-import com.godzuche.dend.features.onboarding.components.WelcomeScreen
+import com.godzuche.dend.features.onboarding.components.WelcomePage
 import com.godzuche.dend.ui.theme.DendTheme
 
 class MainActivity : ComponentActivity() {
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
             }
 
             DendTheme {
-                WelcomeScreen { }
+                WelcomePage { }
             }
         }
     }
