@@ -1,7 +1,6 @@
-package com.godzuche.dend
+package com.godzuche.dend.app
 
 import android.Manifest
-import android.app.Activity
 import android.app.role.RoleManager
 import android.content.ComponentName
 import android.content.Context
@@ -21,10 +20,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.LaunchedEffect
-import com.godzuche.dend.features.onboarding.components.WelcomePage
-import com.godzuche.dend.ui.theme.DendTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +31,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+            val onboardingViewModel = viewModel<OnboardingViewModel>()
+
             val permissionLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.RequestMultiplePermissions()
             ) { perms ->
@@ -50,14 +51,15 @@ class MainActivity : ComponentActivity() {
 
             val callScreeningRoleLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.StartActivityForResult()
-            ) { result: androidx.activity.result.ActivityResult ->
-                if (result.resultCode == Activity.RESULT_OK) {
+            ) { result: ActivityResult ->
+                if (result.resultCode == RESULT_OK) {
                     //  you will get result here in result.data
                     Log.d("MainActivity", "Role granted. data: ${result.data?.data}")
-//                    applicationContext.bindMyService()
-                    permissionLauncher.launch(CALL_SCREENING_PERMISSIONS)
+                    onboardingViewModel.onPermissionResult(true)
+//                    permissionLauncher.launch(CALL_SCREENING_PERMISSIONS)
                 } else {
                     Log.d("MainActivity", "Role denied")
+                    onboardingViewModel.onPermissionResult(false)
                 }
             }
 
@@ -69,13 +71,16 @@ class MainActivity : ComponentActivity() {
 //            }
             }
 
-            LaunchedEffect(Unit) {
-                launchRoleRequest()
-            }
+//            LaunchedEffect(Unit) {
+//                launchRoleRequest()
+//            }
 
-            DendTheme {
-                WelcomePage { }
-            }
+            App(
+                onRequestRolePermission = {
+                    launchRoleRequest()
+                },
+                onboardingViewModel = onboardingViewModel,
+            )
         }
     }
 }
