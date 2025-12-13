@@ -1,71 +1,65 @@
 package com.godzuche.dend.features.main.impl.presentation
 
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.godzuche.dend.features.main.impl.navigation.DashboardNavKey
-import com.godzuche.dend.features.main.impl.navigation.LogsNavKey
+import com.godzuche.dend.designsystem.theme.DendTheme
+import com.godzuche.dend.features.activity.impl.navigation.activityEntry
+import com.godzuche.dend.features.firewall.api.FirewallNavKey
+import com.godzuche.dend.features.firewall.impl.navigation.firewallEntry
 import com.godzuche.dend.features.main.impl.navigation.Navigator
-import com.godzuche.dend.features.main.impl.navigation.RulesNavKey
 import com.godzuche.dend.features.main.impl.navigation.TOP_LEVEL_MAIN_SCREEN_ROUTES
 import com.godzuche.dend.features.main.impl.navigation.rememberNavigationState
 import com.godzuche.dend.features.main.impl.navigation.toEntries
 import com.godzuche.dend.features.main.impl.presentation.components.DenDNavigationBar
+import com.godzuche.dend.features.rules.impl.navigation.rulesEntry
 
 @Composable
 fun MainScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showOnboardingSuccessMessage: Boolean = false,
 ) {
-//    val backStack = remember {
-//        mutableStateListOf<Any>(DashboardNavKey)
-//    }
-
     val navigationState = rememberNavigationState(
-        startRoute = DashboardNavKey,
+        startRoute = FirewallNavKey,
         topLevelRoutes = TOP_LEVEL_MAIN_SCREEN_ROUTES.keys
     )
 
     val navigator = remember { Navigator(navigationState) }
 
-    val entryProvider = /*entryProvider {*/
-//        featureASection(onSubRouteClick = { navigator.navigate(RouteA1) })
-//        featureBSection(onSubRouteClick = { navigator.navigate(RouteB1) })
-//        featureCSection(onSubRouteClick = { navigator.navigate(RouteC1) })
-//    }
-        entryProvider {
-            entry<DashboardNavKey> {
-                DummyScreen("Dashboard")
-            }
-            entry<RulesNavKey> {
-                DummyScreen("Rules")
-            }
-            entry<LogsNavKey> {
-                DummyScreen("Logs")
-            }
+    val entryProvider = entryProvider {
+        firewallEntry()
+        rulesEntry()
+        activityEntry()
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        if (showOnboardingSuccessMessage) {
+            snackbarHostState.showSnackbar(
+                message = "Firewall activated!",
+            )
         }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             DenDNavigationBar(
                 selectedKey = navigationState.topLevelRoute,
                 onSelectKey = { navKey ->
-                    println("BottomNavigate to key: $navKey")
                     navigator.navigate(navKey)
                 },
             )
@@ -80,47 +74,35 @@ fun MainScreen(
                 entryProvider = entryProvider
             ),
             onBack = navigator::goBack,
-//            transitionSpec = {
-//                slideInHorizontally(
-//                    initialOffsetX = { it }
-//                ) + fadeIn() togetherWith
-//                        slideOutHorizontally(
-//                            targetOffsetX = { -it }
-//                        ) + fadeOut()
-//            },
-//            popTransitionSpec = {
-//                slideInHorizontally(
-//                    initialOffsetX = { -it }
-//                ) + fadeIn() togetherWith
-//                        slideOutHorizontally(
-//                            targetOffsetX = { it }
-//                        ) + fadeOut()
-//            },
-//            predictivePopTransitionSpec = {
-//                slideInHorizontally(
-//                    initialOffsetX = { -it }
-//                ) + fadeIn() togetherWith
-//                        slideOutHorizontally(
-//                            targetOffsetX = { it }
-//                        ) + fadeOut()
-//            },
+            transitionSpec = {
+                fadeIn(
+                    animationSpec = tween(durationMillis = 250),
+                ) togetherWith fadeOut(
+                    animationSpec = tween(durationMillis = 250),
+                )
+            },
+            popTransitionSpec = {
+                fadeIn(
+                    animationSpec = tween(durationMillis = 250)
+                ) togetherWith fadeOut(
+                    animationSpec = tween(durationMillis = 250),
+                )
+            },
+            predictivePopTransitionSpec = {
+                fadeIn(
+                    animationSpec = tween(durationMillis = 250),
+                ) togetherWith fadeOut(
+                    animationSpec = tween(durationMillis = 250),
+                )
+            },
         )
 
     }
 
 }
 
+@Preview(showBackground = true, device = "id:pixel_6")
 @Composable
-fun DummyScreen(
-    title: String,
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Text(
-            text = title,
-            fontSize = 45.sp,
-        )
-    }
+fun MainScreenPreview() = DendTheme {
+    MainScreen()
 }

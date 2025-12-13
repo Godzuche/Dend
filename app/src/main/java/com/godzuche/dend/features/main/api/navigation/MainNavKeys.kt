@@ -1,5 +1,9 @@
 package com.godzuche.dend.features.main.api.navigation
 
 import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
 
-data object MainNavKey: NavKey
+@Serializable
+data class MainNavKey(
+    val showOnboardingSuccessMessage: Boolean,
+): NavKey

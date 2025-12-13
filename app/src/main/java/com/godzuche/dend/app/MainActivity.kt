@@ -55,11 +55,11 @@ class MainActivity : ComponentActivity() {
                 if (result.resultCode == RESULT_OK) {
                     //  you will get result here in result.data
                     Log.d("MainActivity", "Role granted. data: ${result.data?.data}")
-                    onboardingViewModel.onPermissionResult(true)
+                    onboardingViewModel.onRolePermissionResult(true)
 //                    permissionLauncher.launch(CALL_SCREENING_PERMISSIONS)
                 } else {
                     Log.d("MainActivity", "Role denied")
-                    onboardingViewModel.onPermissionResult(false)
+                    onboardingViewModel.onRolePermissionResult(false)
                 }
             }
 
@@ -222,4 +222,10 @@ val CALL_SCREENING_PERMISSIONS = arrayOf(
 
 fun Context.haveAllPermissions(permissions: Array<String>): Boolean {
     return permissions.all { checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
+}
+
+fun Context.checkPermissions(permissions: Array<String>): Map<String, Boolean> {
+    return permissions.associateWith {
+        checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
+    }
 }

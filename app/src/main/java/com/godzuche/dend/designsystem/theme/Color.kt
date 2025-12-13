@@ -1,4 +1,4 @@
-package com.godzuche.dend.ui.theme
+package com.godzuche.dend.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
