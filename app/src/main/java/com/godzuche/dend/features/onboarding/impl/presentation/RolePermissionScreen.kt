@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godzuche.dend.R
-import com.godzuche.dend.designsystem.theme.DendTheme
+import com.godzuche.dend.core.designsystem.theme.DendTheme
 
 @Composable
 fun RolePermissionScreen(

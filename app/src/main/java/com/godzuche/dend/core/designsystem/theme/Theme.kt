@@ -1,4 +1,4 @@
-package com.godzuche.dend.designsystem.theme
+package com.godzuche.dend.core.designsystem.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

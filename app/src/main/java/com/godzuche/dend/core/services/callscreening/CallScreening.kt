@@ -1,4 +1,4 @@
-package com.godzuche.dend.services.callscreening
+package com.godzuche.dend.core.services.callscreening
 
 import android.Manifest
 import android.content.ComponentName
@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.IBinder
 import android.telecom.Call
 import android.telecom.CallScreeningService
-import android.telecom.CallScreeningService.CallResponse
 import android.telecom.Connection
 import android.util.Log
 

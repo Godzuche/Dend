@@ -37,11 +37,11 @@ import com.godzuche.dend.R
 import com.godzuche.dend.core.utils.checkPermissions
 import com.godzuche.dend.core.utils.isPermissionPermanentlyDeclined
 import com.godzuche.dend.core.utils.openAppSettings
-import com.godzuche.dend.designsystem.theme.DendTheme
+import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.onboarding.impl.components.PermanentlyDeniedDialog
 import com.godzuche.dend.features.onboarding.impl.components.PermissionChecklistItem
-import com.godzuche.dend.services.callscreening.CALL_SCREENING_PERMISSIONS
-import com.godzuche.dend.services.callscreening.bindMyService
+import com.godzuche.dend.core.services.callscreening.CALL_SCREENING_PERMISSIONS
+import com.godzuche.dend.core.services.callscreening.bindMyService
 
 @Composable
 fun CorePermissionsScreen(

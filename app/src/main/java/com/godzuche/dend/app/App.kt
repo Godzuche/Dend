@@ -6,7 +6,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.godzuche.dend.app.navigation.NavigationRoot
-import com.godzuche.dend.designsystem.theme.DendTheme
+import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
 
 @Composable

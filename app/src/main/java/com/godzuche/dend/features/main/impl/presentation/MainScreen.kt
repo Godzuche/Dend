@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.godzuche.dend.designsystem.theme.DendTheme
+import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.activity.impl.navigation.activityEntry
 import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.firewall.impl.navigation.firewallEntry

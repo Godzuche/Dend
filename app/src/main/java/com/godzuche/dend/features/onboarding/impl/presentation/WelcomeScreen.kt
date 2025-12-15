@@ -31,7 +31,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.godzuche.dend.R
-import com.godzuche.dend.designsystem.theme.DendTheme
+import com.godzuche.dend.core.designsystem.theme.DendTheme
 
 @Composable
 fun WelcomeScreen(
