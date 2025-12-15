@@ -1,7 +1,7 @@
 package com.godzuche.dend.features.onboarding.impl.presentation
 
 import android.Manifest
-import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -20,9 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -31,11 +32,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import com.godzuche.dend.R
-import com.godzuche.dend.app.CALL_SCREENING_PERMISSIONS
-import com.godzuche.dend.app.checkPermissions
+import com.godzuche.dend.core.utils.checkPermissions
+import com.godzuche.dend.core.utils.isPermissionPermanentlyDeclined
+import com.godzuche.dend.core.utils.openAppSettings
 import com.godzuche.dend.designsystem.theme.DendTheme
+import com.godzuche.dend.features.onboarding.impl.components.PermanentlyDeniedDialog
 import com.godzuche.dend.features.onboarding.impl.components.PermissionChecklistItem
+import com.godzuche.dend.services.callscreening.CALL_SCREENING_PERMISSIONS
+import com.godzuche.dend.services.callscreening.bindMyService
 
 @Composable
 fun CorePermissionsScreen(
@@ -48,6 +54,8 @@ fun CorePermissionsScreen(
         onPermissionResult = onboardingViewModel::onSinglePermissionResult,
         onFinishClicked = onboardingViewModel::onFinishClicked,
         onCheckPermissionsGranted = onboardingViewModel::onCheckPermissionsGranted,
+        visiblePermissionDialogQueue = onboardingViewModel.visiblePermissionDialogQueue,
+        onDismissPermissionDialog = onboardingViewModel::dismissPermissionDialog,
     )
 
 }
@@ -55,51 +63,90 @@ fun CorePermissionsScreen(
 @Composable
 fun CorePermissionsScreenContent(
     state: CorePermissionsUiState,
+    visiblePermissionDialogQueue: SnapshotStateList<PermissionItem>,
     modifier: Modifier = Modifier,
     onPermissionResult: (String, Boolean) -> Unit,
     onFinishClicked: () -> Unit,
     onCheckPermissionsGranted: (Map<String, Boolean>) -> Unit,
+    onDismissPermissionDialog: () -> Unit,
 ) {
     val context = LocalContext.current
+    val activity = LocalActivity.current
 
-    val launchers = mapOf(
-        Manifest.permission.ANSWER_PHONE_CALLS to rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            onPermissionResult(
-                Manifest.permission.ANSWER_PHONE_CALLS,
-                isGranted,
-            )
-        },
-        Manifest.permission.READ_CONTACTS to rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            onPermissionResult(
-                Manifest.permission.READ_CONTACTS,
-                isGranted,
-            )
-        },
-        /*Manifest.permission.READ_CALL_LOG*/
-        CALL_HISTORY_PERMISSIONS to rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestMultiplePermissions()
-        ) { results ->
-            // When READ_CALL_LOG is granted, we also grant our conceptual WRITE_CALL_LOG
-            // since they are requested together.
+    val multiplePermissionsResultLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
+        val callHistoryPermissions = CALL_HISTORY_PERMISSIONS.split(",")
+        val callHistoryPermissionsResult = perms.filterKeys { it in callHistoryPermissions }
+            .ifEmpty { null }
+
+        callHistoryPermissionsResult?.let {
+            val isGranted = it.all { it.value }
             onPermissionResult(
                 CALL_HISTORY_PERMISSIONS,
-                results.all { it.value },
+                isGranted,
             )
-        },
-    )
+        }
 
-    LaunchedEffect(Unit) {
+        perms.filterKeys { it !in callHistoryPermissions }
+            .forEach {
+                onPermissionResult(
+                    it.key,
+                    it.value,
+                )
+            }
+    }
+
+    visiblePermissionDialogQueue
+        .reversed()
+        .forEach { permissionItem ->
+            PermanentlyDeniedDialog(
+                permissionName = permissionItem.title,
+                featureDescription = permissionItem.subtitle.replaceFirst(
+                    "Allows the app to ",
+                    "to "
+                ),
+                onDismiss = {
+                    onDismissPermissionDialog()
+                },
+                isPermanentlyDeclined = activity?.isPermissionPermanentlyDeclined(permissionItem.permission)
+                    ?: false,
+                onGoToSettings = {
+                    onDismissPermissionDialog()
+                    context.openAppSettings()
+                },
+                onRequestPermission = {
+                    onDismissPermissionDialog()
+                    when (permissionItem.permission == CALL_HISTORY_PERMISSIONS) {
+                        true -> {
+                            multiplePermissionsResultLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_CALL_LOG,
+                                    Manifest.permission.WRITE_CALL_LOG,
+                                )
+                            )
+                        }
+
+                        else -> {
+                            multiplePermissionsResultLauncher.launch(
+                                arrayOf(permissionItem.permission)
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+    LifecycleStartEffect(Unit) {
         val checkPermissionsResults = context.checkPermissions(CALL_SCREENING_PERMISSIONS)
         onCheckPermissionsGranted(checkPermissionsResults)
+
+        onStopOrDispose { }
     }
 
     Scaffold { paddingValues ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 32.dp)
@@ -144,10 +191,12 @@ fun CorePermissionsScreenContent(
                     key = { index: Int, item: PermissionItem -> item.permission },
                 ) { index, item ->
                     PermissionChecklistItem(
-                        item = item, onEnableClick = { permission ->
+                        item = item,
+                        onEnableClick = { permission ->
+                            println("UI Click permission: $permission")
                             when (permission == CALL_HISTORY_PERMISSIONS) {
                                 true -> {
-                                    (launchers[permission] as? ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>)?.launch(
+                                    multiplePermissionsResultLauncher.launch(
                                         arrayOf(
                                             Manifest.permission.READ_CALL_LOG,
                                             Manifest.permission.WRITE_CALL_LOG,
@@ -156,8 +205,8 @@ fun CorePermissionsScreenContent(
                                 }
 
                                 else -> {
-                                    (launchers[permission] as? ManagedActivityResultLauncher<String, Boolean>)?.launch(
-                                        permission
+                                    multiplePermissionsResultLauncher.launch(
+                                        arrayOf(permission)
                                     )
                                 }
                             }
@@ -171,7 +220,10 @@ fun CorePermissionsScreenContent(
             }
 
             ElevatedButton(
-                onClick = onFinishClicked,
+                onClick = {
+                    context.applicationContext.bindMyService()
+                    onFinishClicked()
+                },
                 enabled = state.isFinishButtonEnabled,
                 modifier = Modifier
                     .padding(bottom = 40.dp)
@@ -194,5 +246,7 @@ private fun CorePermissionsScreenPreview() = DendTheme {
         onPermissionResult = { _, _ -> },
         onFinishClicked = {},
         onCheckPermissionsGranted = {},
+        visiblePermissionDialogQueue = mutableStateListOf(),
+        onDismissPermissionDialog = {},
     )
 }

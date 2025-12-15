@@ -31,7 +31,7 @@
         </activity>
 
         <service
-            android:name=".app.ScreeningService"
+            android:name=".services.callscreening.ScreeningService"
             android:exported="false"
             android:permission="android.permission.BIND_SCREENING_SERVICE">
             <intent-filter>
