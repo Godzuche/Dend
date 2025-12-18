@@ -20,7 +20,6 @@ class OnboardingViewModel : ViewModel() {
     private val _events = MutableSharedFlow<OnboardingEvent>()
     val events = _events.asSharedFlow()
 
-    //    val visiblePermissionDialogQueue = mutableStateListOf<String>()
     val visiblePermissionDialogQueue = mutableStateListOf<PermissionItem>()
 
     fun dismissPermissionDialog() {
