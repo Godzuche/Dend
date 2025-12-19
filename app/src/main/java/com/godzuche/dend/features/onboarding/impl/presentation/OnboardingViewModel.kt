@@ -3,6 +3,7 @@ package com.godzuche.dend.features.onboarding.impl.presentation
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.godzuche.dend.core.domain.repository.UserDataRepository
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class OnboardingViewModel : ViewModel() {
+class OnboardingViewModel(
+    private val userDataRepository: UserDataRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CorePermissionsUiState())
     val uiState = _uiState.asStateFlow()
@@ -103,8 +106,11 @@ class OnboardingViewModel : ViewModel() {
 
     fun onFinishClicked() {
         if (uiState.value.isFinishButtonEnabled) {
-            // TODO: Perform any first-time setup here if needed.
-            viewModelScope.launch { _events.emit(OnboardingEvent.OnboardingSuccess) }
+            // Perform any first-time setup here if needed
+            viewModelScope.launch {
+                userDataRepository.setShouldHideOnboarding(true)
+                _events.emit(OnboardingEvent.OnboardingSuccess)
+            }
         }
     }
 
