@@ -1,7 +1,8 @@
 package com.godzuche.dend.features.onboarding.impl.navigation
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.godzuche.dend.features.onboarding.api.navigation.CorePermissionsScreenNavKey
 import com.godzuche.dend.features.onboarding.api.navigation.OnboardingGraphNavKey
 import com.godzuche.dend.features.onboarding.api.navigation.RolePermissionScreenNavKey
@@ -11,7 +12,7 @@ import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewMod
 import com.godzuche.dend.features.onboarding.impl.presentation.RolePermissionScreen
 import com.godzuche.dend.features.onboarding.impl.presentation.WelcomeScreen
 
-fun EntryProviderScope<Any>.onboardingGraphEntry(
+fun EntryProviderScope<NavKey>.onboardingGraphEntry(
     onboardingViewModel: OnboardingViewModel,
     onOnboardingSuccess: () -> Unit,
     onRequestRolePermission: () -> Unit,
@@ -25,8 +26,8 @@ fun EntryProviderScope<Any>.onboardingGraphEntry(
     }
 }
 
-fun EntryProviderScope<Any>.onboardingWelcomeEntry(
-    backStack: SnapshotStateList<Any>,
+fun EntryProviderScope<NavKey>.onboardingWelcomeEntry(
+    backStack: NavBackStack<NavKey>,
 ) {
     entry<WelcomeScreenNavKey> {
         WelcomeScreen(
@@ -37,7 +38,7 @@ fun EntryProviderScope<Any>.onboardingWelcomeEntry(
     }
 }
 
-fun EntryProviderScope<Any>.onboardingRolePermissionEntry(
+fun EntryProviderScope<NavKey>.onboardingRolePermissionEntry(
     onGrantPermissionClick: () -> Unit,
 ) {
     entry<RolePermissionScreenNavKey> {
@@ -47,7 +48,7 @@ fun EntryProviderScope<Any>.onboardingRolePermissionEntry(
     }
 }
 
-fun EntryProviderScope<Any>.onboardingCorePermissionsEntry(
+fun EntryProviderScope<NavKey>.onboardingCorePermissionsEntry(
     onboardingViewModel: OnboardingViewModel,
 ) {
     entry<CorePermissionsScreenNavKey> {

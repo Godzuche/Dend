@@ -20,7 +20,7 @@ import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.activity.impl.navigation.activityEntry
 import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.firewall.impl.navigation.firewallEntry
-import com.godzuche.dend.features.main.impl.navigation.Navigator
+import com.godzuche.dend.features.main.impl.navigation.MultipleStacksNavigator
 import com.godzuche.dend.features.main.impl.navigation.TOP_LEVEL_MAIN_SCREEN_ROUTES
 import com.godzuche.dend.features.main.impl.navigation.rememberNavigationState
 import com.godzuche.dend.features.main.impl.navigation.toEntries
@@ -37,7 +37,7 @@ fun MainScreen(
         topLevelRoutes = TOP_LEVEL_MAIN_SCREEN_ROUTES.keys
     )
 
-    val navigator = remember { Navigator(navigationState) }
+    val navigator = remember { MultipleStacksNavigator(navigationState) }
 
     val entryProvider = entryProvider {
         firewallEntry()
@@ -46,7 +46,7 @@ fun MainScreen(
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(showOnboardingSuccessMessage) {
         if (showOnboardingSuccessMessage) {
             snackbarHostState.showSnackbar(
                 message = "Firewall activated!",

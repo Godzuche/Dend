@@ -2,7 +2,7 @@ package com.godzuche.dend.features.main.impl.navigation
 
 import androidx.navigation3.runtime.NavKey
 
-class Navigator(val state: NavigationState) {
+class MultipleStacksNavigator(val state: NavigationState) {
     fun navigate(route: NavKey) {
         if (route in state.backStacks.keys) {
             // This is a top level route, just switch to it

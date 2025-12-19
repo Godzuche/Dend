@@ -11,6 +11,7 @@ import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewMod
 
 @Composable
 fun App(
+    shouldHideOnboarding: Boolean,
     onRequestRolePermission: () -> Unit,
     onboardingViewModel: OnboardingViewModel, // Todo: use Koin DI
 ) {
@@ -19,6 +20,7 @@ fun App(
             color = MaterialTheme.colorScheme.background,
         ) {
             NavigationRoot(
+                shouldHideOnboarding = shouldHideOnboarding,
                 onboardingViewModel = onboardingViewModel,
                 onRequestRolePermission = onRequestRolePermission,
                 modifier = Modifier

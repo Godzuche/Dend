@@ -6,11 +6,10 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.godzuche.dend.features.main.api.navigation.MainNavKey
@@ -21,13 +20,16 @@ import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewMod
 
 @Composable
 fun NavigationRoot(
+    shouldHideOnboarding: Boolean,
     modifier: Modifier = Modifier,
     onboardingViewModel: OnboardingViewModel,
     onRequestRolePermission: () -> Unit,
 ) {
-    val backStack = remember {
-        mutableStateListOf<Any>(OnboardingGraphNavKey)
-    }
+    val backStack = rememberNavBackStack(
+        if (shouldHideOnboarding) {
+            MainNavKey(showOnboardingSuccessMessage = false)
+        } else OnboardingGraphNavKey
+    )
 
     NavDisplay(
         backStack = backStack,

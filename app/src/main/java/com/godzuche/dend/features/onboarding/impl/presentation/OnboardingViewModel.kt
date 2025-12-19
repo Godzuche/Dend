@@ -1,7 +1,5 @@
 package com.godzuche.dend.features.onboarding.impl.presentation
 
-import android.Manifest
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

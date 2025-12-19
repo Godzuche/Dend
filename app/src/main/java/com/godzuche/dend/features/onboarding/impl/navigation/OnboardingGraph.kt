@@ -11,16 +11,17 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.godzuche.dend.app.navigation.rememberNavBackStack
 import com.godzuche.dend.features.onboarding.api.navigation.CorePermissionsScreenNavKey
 import com.godzuche.dend.features.onboarding.api.navigation.WelcomeScreenNavKey
 import com.godzuche.dend.features.onboarding.impl.components.RoleSettingsDialog
@@ -34,9 +35,7 @@ fun OnboardingGraph(
     onRequestRolePermission: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val onboardingBackStack = remember {
-        mutableStateListOf<Any>(WelcomeScreenNavKey)
-    }
+    val onboardingBackStack = rememberNavBackStack<NavKey>(WelcomeScreenNavKey)
 
     var showSettingsDialog by remember { mutableStateOf(false) }
 
