@@ -3,6 +3,7 @@ package com.godzuche.dend.features.onboarding.impl.presentation
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -59,7 +60,7 @@ class OnboardingViewModel : ViewModel() {
             }
 
             currentState.copy(
-                permissions = updatedPermissions,
+                permissions = updatedPermissions.toPersistentList(),
             )
         }
     }
@@ -96,7 +97,7 @@ class OnboardingViewModel : ViewModel() {
                     it
                 }
             }
-            currentState.copy(permissions = updatedPermissions)
+            currentState.copy(permissions = updatedPermissions.toPersistentList())
         }
     }
 

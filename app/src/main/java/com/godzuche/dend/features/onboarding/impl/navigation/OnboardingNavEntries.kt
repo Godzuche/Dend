@@ -8,18 +8,15 @@ import com.godzuche.dend.features.onboarding.api.navigation.OnboardingGraphNavKe
 import com.godzuche.dend.features.onboarding.api.navigation.RolePermissionScreenNavKey
 import com.godzuche.dend.features.onboarding.api.navigation.WelcomeScreenNavKey
 import com.godzuche.dend.features.onboarding.impl.presentation.CorePermissionsScreen
-import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
 import com.godzuche.dend.features.onboarding.impl.presentation.RolePermissionScreen
 import com.godzuche.dend.features.onboarding.impl.presentation.WelcomeScreen
 
 fun EntryProviderScope<NavKey>.onboardingGraphEntry(
-    onboardingViewModel: OnboardingViewModel,
     onOnboardingSuccess: () -> Unit,
     onRequestRolePermission: () -> Unit,
 ) {
     entry<OnboardingGraphNavKey> {
         OnboardingGraph(
-            onboardingViewModel = onboardingViewModel,
             onOnboardingSuccess = onOnboardingSuccess,
             onRequestRolePermission = onRequestRolePermission,
         )
@@ -38,22 +35,14 @@ fun EntryProviderScope<NavKey>.onboardingWelcomeEntry(
     }
 }
 
-fun EntryProviderScope<NavKey>.onboardingRolePermissionEntry(
-    onGrantPermissionClick: () -> Unit,
-) {
+fun EntryProviderScope<NavKey>.onboardingRolePermissionEntry() {
     entry<RolePermissionScreenNavKey> {
-        RolePermissionScreen(
-            onGrantPermissionClick = onGrantPermissionClick,
-        )
+        RolePermissionScreen()
     }
 }
 
-fun EntryProviderScope<NavKey>.onboardingCorePermissionsEntry(
-    onboardingViewModel: OnboardingViewModel,
-) {
+fun EntryProviderScope<NavKey>.onboardingCorePermissionsEntry() {
     entry<CorePermissionsScreenNavKey> {
-        CorePermissionsScreen(
-            onboardingViewModel = onboardingViewModel,
-        )
+        CorePermissionsScreen()
     }
 }

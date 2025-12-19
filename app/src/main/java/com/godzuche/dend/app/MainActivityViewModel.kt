@@ -2,9 +2,9 @@ package com.godzuche.dend.app
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.godzuche.dend.core.data.ThemeConfig
-import com.godzuche.dend.core.data.UserDataRepository
-import com.godzuche.dend.core.data.UserPreferences
+import com.godzuche.dend.core.domain.model.ThemeConfig
+import com.godzuche.dend.core.domain.model.UserPreferences
+import com.godzuche.dend.core.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -28,11 +28,6 @@ sealed interface MainActivityUiState {
     data class Success(val userData: UserPreferences) : MainActivityUiState {
         override val shouldEnableDynamicTheming = userData.useDynamicColor
 
-//        override val shouldUseAndroidTheme: Boolean = when (userData.themeBrand) {
-//            ThemeBrand.DEFAULT -> false
-//            ThemeBrand.ANDROID -> true
-//        }
-
         override fun shouldUseDarkTheme(isSystemDarkTheme: Boolean) =
             when (userData.themeConfig) {
                 ThemeConfig.FOLLOW_SYSTEM -> isSystemDarkTheme
@@ -54,14 +49,9 @@ sealed interface MainActivityUiState {
     val shouldEnableDynamicTheming: Boolean get() = false
 
     /**
-     * Returns `true` if the Android theme should be used.
-     */
-    val shouldUseAndroidTheme: Boolean get() = false
-
-    /**
      * Returns `true` if dark theme should be used.
      */
     fun shouldUseDarkTheme(isSystemDarkTheme: Boolean) = isSystemDarkTheme
 
-    val  shouldHideOnboarding: Boolean get() = false
+    val shouldHideOnboarding: Boolean get() = false
 }

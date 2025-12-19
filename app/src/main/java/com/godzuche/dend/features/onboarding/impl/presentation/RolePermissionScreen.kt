@@ -25,10 +25,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
-fun RolePermissionScreen(
-    onGrantPermissionClick: () -> Unit
+fun RolePermissionScreen() {
+    val onboardingViewModel = koinActivityViewModel<OnboardingViewModel>()
+    RolePermissionScreenContent(
+        onGrantPermissionClick = onboardingViewModel::onGrantRolePermissionClicked,
+    )
+
+}
+
+@Composable
+fun RolePermissionScreenContent(
+    onGrantPermissionClick: () -> Unit,
 ) {
     Scaffold { innerPadding ->
         Column(
@@ -99,5 +109,5 @@ fun RolePermissionScreen(
 @Preview(showBackground = true, device = "id:pixel_6")
 @Composable
 private fun RolePermissionScreenPreview() = DendTheme {
-    RolePermissionScreen(onGrantPermissionClick = {})
+    RolePermissionScreenContent(onGrantPermissionClick = {})
 }

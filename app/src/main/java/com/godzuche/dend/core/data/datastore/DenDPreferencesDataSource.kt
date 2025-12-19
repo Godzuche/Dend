@@ -1,9 +1,9 @@
 package com.godzuche.dend.core.data.datastore
 
 import androidx.datastore.core.DataStore
-import com.godzuche.dend.core.data.ThemeConfig
-import com.godzuche.dend.core.data.UserPreferences
-import com.godzuche.dend.core.data.UserPreferencesData
+import com.godzuche.dend.core.data.model.UserPreferencesData
+import com.godzuche.dend.core.domain.model.ThemeConfig
+import com.godzuche.dend.core.domain.model.UserPreferences
 import kotlinx.coroutines.flow.map
 
 class DenDPreferencesDataSource(

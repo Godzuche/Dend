@@ -16,13 +16,11 @@ import com.godzuche.dend.features.main.api.navigation.MainNavKey
 import com.godzuche.dend.features.main.impl.navigation.mainScreenEntry
 import com.godzuche.dend.features.onboarding.api.navigation.OnboardingGraphNavKey
 import com.godzuche.dend.features.onboarding.impl.navigation.onboardingGraphEntry
-import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
 
 @Composable
 fun NavigationRoot(
     shouldHideOnboarding: Boolean,
     modifier: Modifier = Modifier,
-    onboardingViewModel: OnboardingViewModel,
     onRequestRolePermission: () -> Unit,
 ) {
     val backStack = rememberNavBackStack(
@@ -41,7 +39,6 @@ fun NavigationRoot(
         ),
         entryProvider = entryProvider {
             onboardingGraphEntry(
-                onboardingViewModel = onboardingViewModel,
                 onOnboardingSuccess = {
                     backStack.remove(OnboardingGraphNavKey)
                     backStack.add(MainNavKey(showOnboardingSuccessMessage = true))

@@ -7,13 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.godzuche.dend.app.navigation.NavigationRoot
 import com.godzuche.dend.core.designsystem.theme.DendTheme
-import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
 
 @Composable
 fun App(
     shouldHideOnboarding: Boolean,
     onRequestRolePermission: () -> Unit,
-    onboardingViewModel: OnboardingViewModel, // Todo: use Koin DI
 ) {
     DendTheme {
         Surface(
@@ -21,10 +19,9 @@ fun App(
         ) {
             NavigationRoot(
                 shouldHideOnboarding = shouldHideOnboarding,
-                onboardingViewModel = onboardingViewModel,
                 onRequestRolePermission = onRequestRolePermission,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
         }
     }

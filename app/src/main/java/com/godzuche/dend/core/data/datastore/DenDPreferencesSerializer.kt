@@ -2,7 +2,7 @@ package com.godzuche.dend.core.data.datastore
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.godzuche.dend.core.data.UserPreferencesData
+import com.godzuche.dend.core.data.model.UserPreferencesData
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream

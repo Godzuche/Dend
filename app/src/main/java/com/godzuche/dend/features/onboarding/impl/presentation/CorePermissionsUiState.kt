@@ -2,9 +2,11 @@ package com.godzuche.dend.features.onboarding.impl.presentation
 
 import android.Manifest
 import androidx.compose.runtime.Stable
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 data class CorePermissionsUiState(
-    val permissions: List<PermissionItem> = listOf(
+    val permissions: PersistentList<PermissionItem> = persistentListOf(
         PermissionItem(
             permission = Manifest.permission.ANSWER_PHONE_CALLS,
             title = "Hang Up on Calls",

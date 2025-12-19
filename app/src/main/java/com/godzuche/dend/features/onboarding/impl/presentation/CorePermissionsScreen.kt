@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,19 +35,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
 import com.godzuche.dend.R
-import com.godzuche.dend.core.utils.checkPermissions
-import com.godzuche.dend.core.utils.isPermissionPermanentlyDeclined
-import com.godzuche.dend.core.utils.openAppSettings
 import com.godzuche.dend.core.designsystem.theme.DendTheme
-import com.godzuche.dend.features.onboarding.impl.components.PermanentlyDeniedDialog
-import com.godzuche.dend.features.onboarding.impl.components.PermissionChecklistItem
+import com.godzuche.dend.core.presentation.utils.checkPermissions
+import com.godzuche.dend.core.presentation.utils.isPermissionPermanentlyDeclined
+import com.godzuche.dend.core.presentation.utils.openAppSettings
 import com.godzuche.dend.core.services.callscreening.CALL_SCREENING_PERMISSIONS
 import com.godzuche.dend.core.services.callscreening.bindMyService
+import com.godzuche.dend.features.onboarding.impl.components.PermanentlyDeniedDialog
+import com.godzuche.dend.features.onboarding.impl.components.PermissionChecklistItem
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
-fun CorePermissionsScreen(
-    onboardingViewModel: OnboardingViewModel,
-) {
+fun CorePermissionsScreen() {
+    val onboardingViewModel = koinActivityViewModel<OnboardingViewModel>()
     val uiState by onboardingViewModel.uiState.collectAsState()
 
     CorePermissionsScreenContent(
@@ -57,7 +58,6 @@ fun CorePermissionsScreen(
         visiblePermissionDialogQueue = onboardingViewModel.visiblePermissionDialogQueue,
         onDismissPermissionDialog = onboardingViewModel::dismissPermissionDialog,
     )
-
 }
 
 @Composable
@@ -246,7 +246,7 @@ private fun CorePermissionsScreenPreview() = DendTheme {
         onPermissionResult = { _, _ -> },
         onFinishClicked = {},
         onCheckPermissionsGranted = {},
-        visiblePermissionDialogQueue = mutableStateListOf(),
+        visiblePermissionDialogQueue = remember { mutableStateListOf() },
         onDismissPermissionDialog = {},
     )
 }

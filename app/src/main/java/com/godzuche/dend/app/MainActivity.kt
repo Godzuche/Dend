@@ -11,29 +11,23 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.trace
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.godzuche.dend.app.util.isSystemInDarkTheme
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.compose.viewmodel.koinActivityViewModel
 
@@ -46,19 +40,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // We keep this as a mutable state, so that we can track changes inside the composition.
-        // This allows us to react to dark/light mode changes.
         var themeSettings by mutableStateOf(
             ThemeSettings(
                 darkTheme = resources.configuration.isSystemInDarkTheme,
-                androidTheme = MainActivityUiState.Loading.shouldUseAndroidTheme,
                 isDynamicThemingEnabled = MainActivityUiState.Loading.shouldEnableDynamicTheming,
             ),
         )
 
-//        var shouldHideOnboarding by mutableStateOf(false)
-
-        // Update the uiState
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 combine(
@@ -67,7 +55,6 @@ class MainActivity : ComponentActivity() {
                 ) { systemDark, uiState ->
                     ThemeSettings(
                         darkTheme = uiState.shouldUseDarkTheme(systemDark),
-                        androidTheme = uiState.shouldUseAndroidTheme,
                         isDynamicThemingEnabled = uiState.shouldEnableDynamicTheming,
                     )
                 }
@@ -110,7 +97,6 @@ class MainActivity : ComponentActivity() {
                 if (result.resultCode == RESULT_OK) {
                     Log.d("MainActivity", "Role granted. data: ${result.data?.data}")
                     onboardingViewModel.onRolePermissionResult(true)
-//                    permissionLauncher.launch(CALL_SCREENING_PERMISSIONS)
                 } else {
                     Log.d("MainActivity", "Role denied")
                     onboardingViewModel.onRolePermissionResult(false)
@@ -141,7 +127,6 @@ class MainActivity : ComponentActivity() {
                             launchRoleRequest()
                         }
                     },
-                    onboardingViewModel = onboardingViewModel,
                 )
             }
         }
@@ -149,27 +134,6 @@ class MainActivity : ComponentActivity() {
 
 }
 
-// Todo: Move to utils
-@Composable
-fun <T> ObserveAsEvent(
-    flow: Flow<T>,
-    key1: Any? = null,
-    key2: Any? = null,
-    onEvent: suspend (T) -> Unit,
-) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(
-        lifecycleOwner.lifecycle,
-        key1,
-        key2,
-    ) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            withContext(Dispatchers.Main.immediate) {
-                flow.collect(onEvent)
-            }
-        }
-    }
-}
 
 /**
  * The default light scrim, as defined by androidx and the platform:
@@ -189,6 +153,5 @@ private val darkScrim = Color.argb(0x80, 0x1b, 0x1b, 0x1b)
  */
 data class ThemeSettings(
     val darkTheme: Boolean,
-    val androidTheme: Boolean,
     val isDynamicThemingEnabled: Boolean,
 )

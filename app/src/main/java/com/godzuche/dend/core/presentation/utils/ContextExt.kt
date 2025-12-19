@@ -1,4 +1,4 @@
-package com.godzuche.dend.core.utils
+package com.godzuche.dend.core.presentation.utils
 
 import android.app.Activity
 import android.content.Context

@@ -27,13 +27,14 @@ import com.godzuche.dend.features.onboarding.api.navigation.WelcomeScreenNavKey
 import com.godzuche.dend.features.onboarding.impl.components.RoleSettingsDialog
 import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingEvent
 import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun OnboardingGraph(
-    onboardingViewModel: OnboardingViewModel,
+    modifier: Modifier = Modifier,
+    onboardingViewModel: OnboardingViewModel = koinActivityViewModel<OnboardingViewModel>(),
     onOnboardingSuccess: () -> Unit,
     onRequestRolePermission: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val onboardingBackStack = rememberNavBackStack<NavKey>(WelcomeScreenNavKey)
 
@@ -95,12 +96,8 @@ fun OnboardingGraph(
         ),
         entryProvider = entryProvider {
             onboardingWelcomeEntry(backStack = onboardingBackStack)
-            onboardingRolePermissionEntry(
-                onGrantPermissionClick = onboardingViewModel::onGrantRolePermissionClicked,
-            )
-            onboardingCorePermissionsEntry(
-                onboardingViewModel = onboardingViewModel,
-            )
+            onboardingRolePermissionEntry()
+            onboardingCorePermissionsEntry()
         },
         transitionSpec = {
             slideInHorizontally(

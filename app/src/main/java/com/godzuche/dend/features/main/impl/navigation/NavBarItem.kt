@@ -2,8 +2,8 @@ package com.godzuche.dend.features.main.impl.navigation
 
 import androidx.annotation.DrawableRes
 import com.godzuche.dend.R
-import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.activity.api.ActivityNavKey
+import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.rules.api.RulesNavKey
 
 data class NavBarItem(

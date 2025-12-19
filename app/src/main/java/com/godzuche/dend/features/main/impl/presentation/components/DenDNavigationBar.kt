@@ -10,9 +10,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavKey
+import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.main.impl.navigation.TOP_LEVEL_MAIN_SCREEN_ROUTES
-import com.godzuche.dend.core.designsystem.theme.DendTheme
 
 @Composable
 fun DenDNavigationBar(
