@@ -28,12 +28,6 @@ class OnboardingViewModel(
         visiblePermissionDialogQueue.removeAt(0)
     }
 
-    fun onGrantRolePermissionClicked() {
-        viewModelScope.launch {
-            _events.emit(OnboardingEvent.RequestRolePermission)
-        }
-    }
-
     fun onRolePermissionResult(isGranted: Boolean) {
         viewModelScope.launch {
             if (isGranted) {

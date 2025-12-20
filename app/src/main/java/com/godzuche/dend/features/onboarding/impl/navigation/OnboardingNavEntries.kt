@@ -13,12 +13,10 @@ import com.godzuche.dend.features.onboarding.impl.presentation.WelcomeScreen
 
 fun EntryProviderScope<NavKey>.onboardingGraphEntry(
     onOnboardingSuccess: () -> Unit,
-    onRequestRolePermission: () -> Unit,
 ) {
     entry<OnboardingGraphNavKey> {
         OnboardingGraph(
             onOnboardingSuccess = onOnboardingSuccess,
-            onRequestRolePermission = onRequestRolePermission,
         )
     }
 }

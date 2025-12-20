@@ -1,16 +1,11 @@
 package com.godzuche.dend.app
 
-import android.app.role.RoleManager
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,14 +17,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.godzuche.dend.app.util.isSystemInDarkTheme
 import com.godzuche.dend.core.designsystem.theme.DendTheme
-import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.compose.viewmodel.koinActivityViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -88,29 +81,7 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.shouldKeepSplashScreen() }
 
         setContent {
-            val onboardingViewModel = koinActivityViewModel<OnboardingViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            val callScreeningRoleLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) { result: ActivityResult ->
-                if (result.resultCode == RESULT_OK) {
-                    Log.d("MainActivity", "Role granted. data: ${result.data?.data}")
-                    onboardingViewModel.onRolePermissionResult(true)
-                } else {
-                    Log.d("MainActivity", "Role denied")
-                    onboardingViewModel.onRolePermissionResult(false)
-                }
-            }
-
-            val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
-            fun launchRoleRequest() {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//                val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
-                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
-                callScreeningRoleLauncher.launch(intent)
-//            }
-            }
 
             DendTheme(
                 darkTheme = themeSettings.darkTheme,
@@ -118,15 +89,6 @@ class MainActivity : ComponentActivity() {
             ) {
                 App(
                     shouldHideOnboarding = uiState.shouldHideOnboarding,
-                    onRequestRolePermission = {
-                        if (roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
-                            // The role is already granted. Maybe the user went to settings and did it manually.
-                            // Proceed to the next step.
-                            onboardingViewModel.onRolePermissionResult(true)
-                        } else {
-                            launchRoleRequest()
-                        }
-                    },
                 )
             }
         }

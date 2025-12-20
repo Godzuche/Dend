@@ -34,7 +34,6 @@ fun OnboardingGraph(
     modifier: Modifier = Modifier,
     onboardingViewModel: OnboardingViewModel = koinActivityViewModel<OnboardingViewModel>(),
     onOnboardingSuccess: () -> Unit,
-    onRequestRolePermission: () -> Unit,
 ) {
     val onboardingBackStack = rememberNavBackStack<NavKey>(WelcomeScreenNavKey)
 
@@ -44,10 +43,6 @@ fun OnboardingGraph(
     LaunchedEffect(Unit) {
         onboardingViewModel.events.collect { event ->
             when (event) {
-                is OnboardingEvent.RequestRolePermission -> {
-                    onRequestRolePermission()
-                }
-
                 is OnboardingEvent.ShowManualRoleSettingsGuidance -> {
                     showSettingsDialog = true
                 }
@@ -79,7 +74,6 @@ fun OnboardingGraph(
             onDismiss = { showSettingsDialog = false },
             onGoToSettings = {
                 showSettingsDialog = false
-                // Create an intent to open the specific "Default apps" screen.
                 val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
                 context.startActivity(intent)
             }

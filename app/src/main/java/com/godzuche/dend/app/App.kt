@@ -11,7 +11,6 @@ import com.godzuche.dend.core.designsystem.theme.DendTheme
 @Composable
 fun App(
     shouldHideOnboarding: Boolean,
-    onRequestRolePermission: () -> Unit,
 ) {
     DendTheme {
         Surface(
@@ -19,7 +18,6 @@ fun App(
         ) {
             NavigationRoot(
                 shouldHideOnboarding = shouldHideOnboarding,
-                onRequestRolePermission = onRequestRolePermission,
                 modifier = Modifier
                     .fillMaxSize(),
             )

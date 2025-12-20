@@ -25,13 +25,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
+import com.godzuche.dend.core.presentation.utils.rememberRoleRequester
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun RolePermissionScreen() {
     val onboardingViewModel = koinActivityViewModel<OnboardingViewModel>()
+    val callScreeningRoleRequester = rememberRoleRequester { isGranted ->
+        onboardingViewModel.onRolePermissionResult(isGranted)
+    }
+
     RolePermissionScreenContent(
-        onGrantPermissionClick = onboardingViewModel::onGrantRolePermissionClicked,
+        onGrantPermissionClick = {
+            if (callScreeningRoleRequester.isRoleHeld()) {
+                onboardingViewModel.onRolePermissionResult(true)
+            } else {
+                callScreeningRoleRequester.requestRole()
+            }
+        },
     )
 
 }

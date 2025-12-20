@@ -21,7 +21,6 @@ import com.godzuche.dend.features.onboarding.impl.navigation.onboardingGraphEntr
 fun NavigationRoot(
     shouldHideOnboarding: Boolean,
     modifier: Modifier = Modifier,
-    onRequestRolePermission: () -> Unit,
 ) {
     val backStack = rememberNavBackStack(
         if (shouldHideOnboarding) {
@@ -43,7 +42,6 @@ fun NavigationRoot(
                     backStack.remove(OnboardingGraphNavKey)
                     backStack.add(MainNavKey(showOnboardingSuccessMessage = true))
                 },
-                onRequestRolePermission = onRequestRolePermission,
             )
 
             mainScreenEntry()
