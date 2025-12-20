@@ -24,7 +24,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.godzuche.dend.app.navigation.rememberNavBackStack
 import com.godzuche.dend.features.onboarding.api.navigation.CorePermissionsScreenNavKey
 import com.godzuche.dend.features.onboarding.api.navigation.WelcomeScreenNavKey
-import com.godzuche.dend.features.onboarding.impl.components.RoleSettingsDialog
+import com.godzuche.dend.features.onboarding.impl.presentation.components.RoleSettingsDialog
 import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingEvent
 import com.godzuche.dend.features.onboarding.impl.presentation.OnboardingViewModel
 import org.koin.compose.viewmodel.koinActivityViewModel

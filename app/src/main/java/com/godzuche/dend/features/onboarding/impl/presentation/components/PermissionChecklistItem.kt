@@ -1,4 +1,4 @@
-package com.godzuche.dend.features.onboarding.impl.components
+package com.godzuche.dend.features.onboarding.impl.presentation.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column

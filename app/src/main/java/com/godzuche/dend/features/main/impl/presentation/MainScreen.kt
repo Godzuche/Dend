@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.godzuche.dend.core.designsystem.theme.DendTheme
+import com.godzuche.dend.features.activity.api.ActivityNavKey
 import com.godzuche.dend.features.activity.impl.navigation.activityEntry
 import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.firewall.impl.navigation.firewallEntry
@@ -25,6 +26,7 @@ import com.godzuche.dend.features.main.impl.navigation.TOP_LEVEL_MAIN_SCREEN_ROU
 import com.godzuche.dend.features.main.impl.navigation.rememberNavigationState
 import com.godzuche.dend.features.main.impl.navigation.toEntries
 import com.godzuche.dend.features.main.impl.presentation.components.DenDNavigationBar
+import com.godzuche.dend.features.rules.api.RulesNavKey
 import com.godzuche.dend.features.rules.impl.navigation.rulesEntry
 
 @Composable
@@ -40,7 +42,14 @@ fun MainScreen(
     val navigator = remember { MultipleStacksNavigator(navigationState) }
 
     val entryProvider = entryProvider {
-        firewallEntry()
+        firewallEntry(
+            onNavigateToActivity = {
+                navigator.navigate(ActivityNavKey)
+            },
+            onNavigateToRules = {
+                navigator.navigate(RulesNavKey)
+            },
+        )
         rulesEntry()
         activityEntry()
     }

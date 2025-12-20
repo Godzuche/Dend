@@ -22,6 +22,7 @@ kotlinx-collections = "0.4.0"
 foundation = "1.10.0"
 androidxCoreSplashscreen = "1.2.0"
 koin-bom = "4.1.1"
+ui = "1.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -71,6 +72,7 @@ koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 koin-ktor = { module = "io.insert-koin:koin-ktor" }
 koin-test = { module = "io.insert-koin:koin-test" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 
 
 [plugins]

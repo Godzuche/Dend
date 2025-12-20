@@ -41,8 +41,8 @@ import com.godzuche.dend.core.presentation.utils.isPermissionPermanentlyDeclined
 import com.godzuche.dend.core.presentation.utils.openAppSettings
 import com.godzuche.dend.core.services.callscreening.CALL_SCREENING_PERMISSIONS
 import com.godzuche.dend.core.services.callscreening.bindMyService
-import com.godzuche.dend.features.onboarding.impl.components.PermanentlyDeniedDialog
-import com.godzuche.dend.features.onboarding.impl.components.PermissionChecklistItem
+import com.godzuche.dend.features.onboarding.impl.presentation.components.PermanentlyDeniedDialog
+import com.godzuche.dend.features.onboarding.impl.presentation.components.PermissionChecklistItem
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
