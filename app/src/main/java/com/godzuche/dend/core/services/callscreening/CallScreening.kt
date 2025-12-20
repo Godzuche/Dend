@@ -1,113 +1,20 @@
-package com.godzuche.dend
+package com.godzuche.dend.core.services.callscreening
 
 import android.Manifest
-import android.app.Activity
-import android.app.role.RoleManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Context.BIND_AUTO_CREATE
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import android.telecom.Call
 import android.telecom.CallScreeningService
 import android.telecom.Connection
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.godzuche.dend.ui.theme.DendTheme
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        setContent {
-            val permissionLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.RequestMultiplePermissions()
-            ) { perms ->
-                val grantedAll = perms.values.all { it }
-                if (grantedAll) {
-                    Log.d("MainActivity", "Perm Granted All")
-                    applicationContext.bindMyService()
-                } else {
-                    // Todo: Handle rejection.
-                    Log.d(
-                        "MainActivity",
-                        "Perm Not Granted: ${perms.filter { !it.value }.map { it.key }}"
-                    )
-                }
-            }
-
-            val callScreeningRoleLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) { result: androidx.activity.result.ActivityResult ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    //  you will get result here in result.data
-                    Log.d("MainActivity", "Role granted. data: ${result.data?.data}")
-//                    applicationContext.bindMyService()
-                    permissionLauncher.launch(CALL_SCREENING_PERMISSIONS)
-                } else {
-                    Log.d("MainActivity", "Role denied")
-                }
-            }
-
-            fun launchRoleRequest() {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val roleManager = getSystemService(ROLE_SERVICE) as RoleManager
-                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
-                callScreeningRoleLauncher.launch(intent)
-//            }
-            }
-
-            LaunchedEffect(Unit) {
-                launchRoleRequest()
-            }
-
-            DendTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DendTheme {
-        Greeting("Android")
-    }
-}
-
-private fun Context.bindMyService() {
+fun Context.bindMyService() {
     Log.d("MainActivity", "binding my service")
     val mCallServiceIntent = Intent("android.telecom.CallScreeningService")
     mCallServiceIntent.setPackage(applicationContext.packageName)
@@ -241,7 +148,3 @@ val CALL_SCREENING_PERMISSIONS = arrayOf(
     Manifest.permission.READ_CALL_LOG,
     Manifest.permission.WRITE_CALL_LOG,
 )
-
-fun Context.haveAllPermissions(permissions: Array<String>): Boolean {
-    return permissions.all { checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED }
-}

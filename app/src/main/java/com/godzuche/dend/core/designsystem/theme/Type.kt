@@ -1,4 +1,4 @@
-package com.godzuche.dend.ui.theme
+package com.godzuche.dend.core.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
