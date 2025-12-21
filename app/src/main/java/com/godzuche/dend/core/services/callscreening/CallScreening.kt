@@ -13,6 +13,16 @@ import android.telecom.Call
 import android.telecom.CallScreeningService
 import android.telecom.Connection
 import android.util.Log
+import com.godzuche.dend.core.data.di.DendDispatchers
+import com.godzuche.dend.core.domain.model.FirewallState
+import com.godzuche.dend.core.domain.repository.UserDataRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
 fun Context.bindMyService() {
     Log.d("MainActivity", "binding my service")
@@ -36,11 +46,22 @@ fun Context.bindMyService() {
     bindService(mCallServiceIntent, mServiceConnection, BIND_AUTO_CREATE)
 }
 
-class ScreeningService : CallScreeningService() {
+class ScreeningService : CallScreeningService(), KoinComponent {
+    val userDataRepository by inject<UserDataRepository>()
+//    val scope by inject<CoroutineScope>()
+//    val ioDispatcher by inject<CoroutineDispatcher>(named(DendDispatchers.IO))
+
     // This function is called when an ingoing or outgoing call
     // is from a number not in the user's contacts list
     override fun onScreenCall(callDetails: Call.Details) {
-        Log.d("MyCallScreeningService", "onScreenCall called")
+        val firewallState = runBlocking {
+            userDataRepository
+                .userPreferencesData
+                .first()
+                .firewallState
+        }
+
+        Log.d("MyCallScreeningService", "onScreenCall called with firewallState: $firewallState")
         // Can check the direction of the call
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val isIncoming = callDetails.callDirection == Call.Details.DIRECTION_INCOMING
@@ -83,8 +104,8 @@ class ScreeningService : CallScreeningService() {
             }
 
 
-            // To disallow (but not rejected) and send to voicemail - Soft Block
-            val response1 = CallResponse.Builder()
+            // To disallow (but not rejected) and send to voicemail - Soft Block (Still blocks network)
+            val blockAndAcceptResponse = CallResponse.Builder()
                 .setDisallowCall(true)
                 .setRejectCall(false)
                 .setSkipCallLog(true) // Recommended
@@ -99,33 +120,55 @@ class ScreeningService : CallScreeningService() {
                 .setSkipNotification(true)
                 .build()
 
-            // Allow, but silent
+            // Allow, but silent like DND
             val allowAndSilentResponse =
                 CallResponse.Builder()
                     .setSilenceCall(true)
                     .build()
 
-            // Tell the system how to respond to the incoming call
-            // and if it should notify the user of the call.
             val normalResponse = CallResponse.Builder()
-                // Sets whether the incoming call should be blocked.
-                .setDisallowCall(false)
-                // Sets whether the incoming call should be rejected as if the user did so manually.
-                .setRejectCall(false)
-                // Sets whether ringing should be silenced for the incoming call.
-                .setSilenceCall(false)
-                // Sets whether the incoming call should not be displayed in the call log.
-                .setSkipCallLog(false)
-                // Sets whether a missed call notification should not be shown for the incoming call.
-                .setSkipNotification(false)
+//                // Sets whether the incoming call should be blocked.
+//                .setDisallowCall(false)
+//                // Sets whether the incoming call should be rejected as if the user did so manually.
+//                .setRejectCall(false)
+//                // Sets whether ringing should be silenced for the incoming call.
+//                .setSilenceCall(false)
+//                // Sets whether the incoming call should not be displayed in the call log.
+//                .setSkipCallLog(false)
+//                // Sets whether a missed call notification should not be shown for the incoming call.
+//                .setSkipNotification(false)
                 .build()
 
-            // Call this function to provide your screening response.
-            respondToCall(callDetails, normalResponse)
+            when (firewallState) {
+                FirewallState.OFF -> {
+                    respondToCall(callDetails, normalResponse)
+                }
+
+                FirewallState.ON -> {
+                    if (isNumberInBlacklist(incomingNumber)) {
+                        respondToCall(callDetails, blockAndRejectResponse)
+                    } else {
+                        respondToCall(callDetails, normalResponse)
+                    }
+                }
+
+                FirewallState.ZEN -> {
+                    if (isNumberInWhitelist(incomingNumber)) {
+                        respondToCall(callDetails, normalResponse)
+                    } else {
+                        respondToCall(callDetails, blockAndRejectResponse)
+                    }
+                }
+            }
         }
 //        }
     }
 }
+
+// Todo: Replace with repository calls
+private fun isNumberInBlacklist(number: String?): Boolean = true
+private fun isNumberInWhitelist(number: String?): Boolean = false
+
 
 private fun extractPhoneNumber(callDetails: Call.Details): String? {
     val handle = callDetails.handle

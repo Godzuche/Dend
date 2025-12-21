@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.godzuche.dend.R
-import com.godzuche.dend.features.firewall.impl.presentation.FirewallState
+import com.godzuche.dend.core.domain.model.FirewallState
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

@@ -8,7 +8,7 @@ import com.godzuche.dend.features.main.impl.presentation.MainScreen
 fun EntryProviderScope<NavKey>.mainScreenEntry() {
     entry<MainNavKey> { key ->
         MainScreen(
-            showOnboardingSuccessMessage = key.showOnboardingSuccessMessage,
+//            showOnboardingSuccessMessage = key.showOnboardingSuccessMessage,
         )
     }
 }

@@ -32,7 +32,7 @@ import com.godzuche.dend.features.rules.impl.navigation.rulesEntry
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    showOnboardingSuccessMessage: Boolean = false,
+//    showOnboardingSuccessMessage: Boolean = false,
 ) {
     val navigationState = rememberNavigationState(
         startRoute = FirewallNavKey,
@@ -55,13 +55,13 @@ fun MainScreen(
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(showOnboardingSuccessMessage) {
-        if (showOnboardingSuccessMessage) {
-            snackbarHostState.showSnackbar(
-                message = "Firewall activated!",
-            )
-        }
-    }
+//    LaunchedEffect(showOnboardingSuccessMessage) {
+//        if (showOnboardingSuccessMessage) {
+//            snackbarHostState.showSnackbar(
+//                message = "Firewall activated!",
+//            )
+//        }
+//    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
