@@ -85,7 +85,7 @@ fun DashboardScreenContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Spacer(Modifier.weight(1f))
 
