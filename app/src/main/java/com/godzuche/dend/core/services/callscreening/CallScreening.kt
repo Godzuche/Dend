@@ -6,23 +6,18 @@ import android.content.Context
 import android.content.Context.BIND_AUTO_CREATE
 import android.content.Intent
 import android.content.ServiceConnection
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.telecom.Call
 import android.telecom.CallScreeningService
 import android.telecom.Connection
 import android.util.Log
-import com.godzuche.dend.core.data.di.DendDispatchers
 import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.core.domain.repository.UserDataRepository
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
 fun Context.bindMyService() {
     Log.d("MainActivity", "binding my service")
@@ -68,7 +63,7 @@ class ScreeningService : CallScreeningService(), KoinComponent {
 
         if (isIncoming) {
             // the handle (e.g. phone number) that the Call is currently connected to
-            val handle: Uri = callDetails.handle
+//            val handle: Uri = callDetails.handle
             // Extract the incoming phone number
             val incomingNumber = extractPhoneNumber(callDetails)
             Log.d("MyCallScreeningService", "Incoming Call = $incomingNumber")
@@ -166,8 +161,17 @@ class ScreeningService : CallScreeningService(), KoinComponent {
 }
 
 // Todo: Replace with repository calls
-private fun isNumberInBlacklist(number: String?): Boolean = true
-private fun isNumberInWhitelist(number: String?): Boolean = false
+private fun isNumberInBlacklist(number: String?): Boolean {
+    return number?.let {
+        true
+    } ?: true
+}
+
+private fun isNumberInWhitelist(number: String?): Boolean {
+    return number?.let { num ->
+        false
+    } ?: false
+}
 
 
 private fun extractPhoneNumber(callDetails: Call.Details): String? {
