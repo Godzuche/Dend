@@ -7,12 +7,12 @@ import com.godzuche.dend.features.firewall.impl.presentation.DashboardScreen
 
 fun EntryProviderScope<NavKey>.firewallEntry(
     onNavigateToActivity: () -> Unit,
-    onNavigateToRules: () -> Unit,
+//    onNavigateToRules: () -> Unit,
 ) {
     entry<FirewallNavKey> {
         DashboardScreen(
             onNavigateToActivity = onNavigateToActivity,
-            onNavigateToRules = onNavigateToRules,
+//            onNavigateToRules = onNavigateToRules,
         )
     }
 }

@@ -53,9 +53,9 @@ fun MainScreen(
             onNavigateToActivity = {
                 navigator.navigate(ActivityNavKey)
             },
-            onNavigateToRules = {
-                navigator.navigate(RulesNavKey)
-            },
+//            onNavigateToRules = {
+//                navigator.navigate(RulesNavKey)
+//            },
         )
         rulesEntry()
         activityEntry()

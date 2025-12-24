@@ -37,7 +37,7 @@ import org.koin.compose.viewmodel.koinActivityViewModel
 @Composable
 fun DashboardScreen(
     onNavigateToActivity: () -> Unit,
-    onNavigateToRules: () -> Unit,
+//    onNavigateToRules: () -> Unit,
     dashboardViewModel: DashboardViewModel = koinActivityViewModel(),
 ) {
     val firewallUiState by dashboardViewModel.firewallUiState.collectAsStateWithLifecycle()
@@ -46,7 +46,7 @@ fun DashboardScreen(
         firewallUiState = firewallUiState,
         onToggleStatus = dashboardViewModel::toggleFirewallState,
         onActivityStatClick = onNavigateToActivity,
-        onRulesStatClick = onNavigateToRules,
+//        onRulesStatClick = onNavigateToRules,
     )
 }
 
@@ -56,7 +56,7 @@ fun DashboardScreenContent(
     firewallUiState: FirewallUiState,
     onToggleStatus: () -> Unit,
     onActivityStatClick: () -> Unit,
-    onRulesStatClick: () -> Unit,
+//    onRulesStatClick: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
 
@@ -178,7 +178,7 @@ private fun DashboardScreenOffPreview() = DendTheme {
         firewallUiState = FirewallUiState.Success(FirewallState.OFF),
         onToggleStatus = {},
         onActivityStatClick = {},
-        onRulesStatClick = {},
+//        onRulesStatClick = {},
     )
 }
 
@@ -189,7 +189,7 @@ private fun DashboardScreenOnPreview() = DendTheme {
         firewallUiState = FirewallUiState.Success(FirewallState.ON),
         onToggleStatus = {},
         onActivityStatClick = {},
-        onRulesStatClick = {},
+//        onRulesStatClick = {},
     )
 }
 
@@ -200,6 +200,6 @@ private fun DashboardScreenZenPreview() = DendTheme {
         firewallUiState = FirewallUiState.Success(FirewallState.ZEN),
         onToggleStatus = {},
         onActivityStatClick = {},
-        onRulesStatClick = {},
+//        onRulesStatClick = {},
     )
 }

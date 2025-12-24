@@ -1,6 +1,5 @@
 package com.godzuche.dend.features.firewall.impl.presentation
 
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.dend.core.domain.model.FirewallState
@@ -44,12 +43,4 @@ class DashboardViewModel(
     private fun FirewallState.cycleState(): FirewallState {
         return this.next()
     }
-}
-
-@Stable
-sealed interface FirewallUiState {
-    data object Loading : FirewallUiState
-    data class Success(override val firewallState: FirewallState) : FirewallUiState
-
-    val firewallState: FirewallState get() = FirewallState.OFF
 }
