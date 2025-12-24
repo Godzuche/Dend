@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,9 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -31,15 +29,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.core.domain.model.FirewallState
+import com.godzuche.dend.core.domain.model.next
 import com.godzuche.dend.features.firewall.impl.presentation.components.StatCard
 import com.godzuche.dend.features.firewall.impl.presentation.components.StatusToggleButton
-import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun DashboardScreen(
     onNavigateToActivity: () -> Unit,
     onNavigateToRules: () -> Unit,
-    dashboardViewModel: DashboardViewModel = koinViewModel(),
+    dashboardViewModel: DashboardViewModel = koinActivityViewModel(),
 ) {
     val firewallUiState by dashboardViewModel.firewallUiState.collectAsStateWithLifecycle()
 
@@ -67,9 +66,7 @@ fun DashboardScreenContent(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary,
-                )
+                CircularProgressIndicator()
             }
         }
 
@@ -92,7 +89,12 @@ fun DashboardScreenContent(
                 StatusToggleButton(
                     state = firewallState,
                     onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+//                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        when (firewallState.next()) {
+                            FirewallState.OFF -> haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            FirewallState.ON -> haptic.performHapticFeedback(HapticFeedbackType.KeyboardTap)
+                            FirewallState.ZEN -> haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        }
                         onToggleStatus()
                     }
                 )
@@ -134,21 +136,30 @@ fun DashboardScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
+                        .height(IntrinsicSize.Max)
                         .alpha(statsAlpha),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // TODO: Navigate to Activity tab (filtered to today)
                     StatCard(
                         modifier = Modifier.weight(1f),
                         label = "Calls Blocked Today",
                         value = "17",
-                        onClick = onActivityStatClick
+                        onClick = onActivityStatClick,
                     )
+
+//                    StatCard(
+//                        modifier = Modifier.weight(1f),
+//                        label = "Numbers on Blacklist",
+//                        value = "42",
+//                        onClick = onRulesStatClick
+//                    )
 
                     StatCard(
                         modifier = Modifier.weight(1f),
-                        label = "Numbers on Blacklist",
-                        value = "42",
-                        onClick = onRulesStatClick
+                        label = "Blocked in Total",
+                        value = "241",
+                        onClick = onActivityStatClick,
                     )
                 }
 //        }

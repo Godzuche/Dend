@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.dend.core.domain.model.FirewallState
+import com.godzuche.dend.core.domain.model.next
 import com.godzuche.dend.core.domain.repository.UserDataRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,11 +42,7 @@ class DashboardViewModel(
     }
 
     private fun FirewallState.cycleState(): FirewallState {
-        return when (this) {
-            FirewallState.OFF -> FirewallState.ON
-            FirewallState.ON -> FirewallState.ZEN
-            FirewallState.ZEN -> FirewallState.OFF
-        }
+        return this.next()
     }
 }
 
