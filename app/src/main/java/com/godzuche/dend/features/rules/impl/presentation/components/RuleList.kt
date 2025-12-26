@@ -76,9 +76,12 @@ fun RuleList(
                             key = { it.number },
                         ) { contactItem ->
                             RuleListItem(
-                                number = contactItem.name,
-                                onRemoveClick = { onRemoveNumberClick(contactItem) }
+                                number = contactItem.displayName, // can also use contactItem.displayNameWithNumber
+                                onRemoveClick = { onRemoveNumberClick(contactItem) },
+                                modifier = Modifier
+                                    .animateItem(),
                             )
+
                             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                         }
                     }

@@ -46,7 +46,7 @@ fun CustomCallLogScreen(
     CustomCallLogScreenContent(
         uiState = uiState.callLogUiState,
         onBackClick = onNavigateBack,
-        onAddNumberToListClick = viewModel::addNumberToList,
+        onAddNumberToListClick = viewModel::addContact,
     )
 }
 
@@ -55,7 +55,7 @@ fun CustomCallLogScreen(
 private fun CustomCallLogScreenContent(
     uiState: CallLogUiState,
     onBackClick: () -> Unit,
-    onAddNumberToListClick: (String) -> Unit,
+    onAddNumberToListClick: (String, String?) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -96,7 +96,10 @@ private fun CustomCallLogScreenContent(
                                 CallLogListItem(
                                     item = callLog,
                                     onAddClick = {
-                                        onAddNumberToListClick(callLog.phoneNumber)
+                                        onAddNumberToListClick(
+                                            callLog.phoneNumber,
+                                            callLog.contactName,
+                                        )
                                         onBackClick() // Navigate back immediately after adding
                                     }
                                 )

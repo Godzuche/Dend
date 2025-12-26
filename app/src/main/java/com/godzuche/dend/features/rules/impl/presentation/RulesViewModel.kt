@@ -35,15 +35,18 @@ sealed interface RulesState {
 
     @Immutable
     data class Success(
-        val contacts: List<ContactItem>
+        override val contacts: List<ContactItem>
     ) : RulesState
+
+    val contacts get() = emptyList<ContactItem>()
 }
 
 data class RulesUiState(
     val selectedRulesTab: RulesTab = RulesTab.BLACKLIST,
     val blacklistState: RulesState = RulesState.Loading,
     val whitelistState: RulesState = RulesState.Loading,
-    val callLogUiState: CallLogUiState = CallLogUiState.Loading
+    val callLogUiState: CallLogUiState = CallLogUiState.Loading,
+    val showAddManuallyDialog: Boolean = false,
 )
 
 class RulesViewModel(
@@ -52,6 +55,10 @@ class RulesViewModel(
 
     private val _uiState = MutableStateFlow(RulesUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        getRules()
+    }
 
     fun getRules() {
         viewModelScope.launch {
@@ -106,16 +113,6 @@ class RulesViewModel(
         }
     }
 
-    fun addNumberToList(number: String) {
-        if (uiState.value.selectedRulesTab == RulesTab.BLACKLIST) {
-            Log.d("RulesViewModel", "Adding $number to blacklist...")
-        } else {
-            Log.d("RulesViewModel", "Adding $number to whitelist...")
-        }
-
-        // Todo: use an event to show a toast for successful addition
-    }
-
     fun onSelectRulesTab(selectedTab: RulesTab) {
         _uiState.update {
             it.copy(
@@ -124,7 +121,7 @@ class RulesViewModel(
         }
     }
 
-    fun onRemoveNumberFromList(contactItem: ContactItem) {
+    fun onRemoveContact(contactItem: ContactItem) {
         if (uiState.value.selectedRulesTab == RulesTab.BLACKLIST) {
             Log.d("RulesViewModel", "Removing ${contactItem.number} to blacklist...")
         } else {
@@ -132,5 +129,83 @@ class RulesViewModel(
         }
 
         // Todo: use an event to show a toast for successful removal
+
+        _uiState.update { currentState ->
+            // Update either the blacklist or whitelist based on the selected tab index.
+            when (currentState.selectedRulesTab) {
+                RulesTab.BLACKLIST -> {
+                    val updatedList = currentState.blacklistState.contacts
+                        .filter { it != contactItem }
+
+                    currentState.copy(
+                        blacklistState = RulesState.Success(
+                            contacts = updatedList,
+                        )
+                    )
+                }
+
+                RulesTab.WHITELIST -> {
+                    val updatedList = currentState.whitelistState.contacts
+                        .filter { it != contactItem }
+                    currentState.copy(
+                        whitelistState = RulesState.Success(
+                            contacts = updatedList,
+                        )
+                    )
+                }
+
+                else -> currentState
+            }
+        }
+        // TODO: also remove this new entry to your persistent
+        // storage (Database/ DataStore) here.
     }
+
+    fun setShowAddManuallyDialogState(shouldShow: Boolean) {
+        _uiState.update {
+            it.copy(
+                showAddManuallyDialog = shouldShow,
+            )
+        }
+    }
+
+    fun addContact(number: String, name: String?) {
+        // Format the entry for display. If name is present, use "Name (Number)", otherwise just the number.
+        val entry = if (!name.isNullOrBlank()) "$name ($number)" else number
+        val contactItem = ContactItem(
+            number = number,
+            name = name,
+        )
+
+        _uiState.update { currentState ->
+            // Update either the blacklist or whitelist based on the selected tab index.
+            when (currentState.selectedRulesTab) {
+                RulesTab.BLACKLIST -> {
+                    Log.d("RulesViewModel", "Adding '$entry' to Blacklist")
+                    // Add to the beginning of the list for immediate visibility in the UI
+                    currentState.copy(
+                        blacklistState = RulesState.Success(
+                            contacts = (listOf(contactItem) + currentState.blacklistState.contacts).toSet()
+                                .toList()
+                        )
+                    )
+                }
+
+                RulesTab.WHITELIST -> {
+                    Log.d("RulesViewModel", "Adding '$entry' to Whitelist")
+                    currentState.copy(
+                        whitelistState = RulesState.Success(
+                            contacts = (listOf(contactItem) + currentState.whitelistState.contacts).toSet()
+                                .toList()
+                        )
+                    )
+                }
+
+                else -> currentState
+            }
+        }
+        // TODO: also save this new entry to your persistent
+        // storage (Database/ DataStore) here.
+    }
+
 }

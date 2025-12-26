@@ -20,10 +20,11 @@ import com.godzuche.dend.R
 @Composable
 fun RuleListItem(
     number: String,
-    onRemoveClick: () -> Unit
+    onRemoveClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically

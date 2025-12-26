@@ -42,6 +42,8 @@ import androidx.core.content.ContextCompat
 import com.godzuche.dend.R
 import com.godzuche.dend.core.data.utils.resolveContactUri
 import com.godzuche.dend.core.designsystem.theme.DendTheme
+import com.godzuche.dend.features.rules.impl.presentation.RulesViewModel
+import org.koin.compose.viewmodel.koinActivityViewModel
 
 private enum class PermissionRequest {
     CONTACTS,
@@ -52,19 +54,17 @@ private enum class PermissionRequest {
 fun AddNumberSheet(
     onDismiss: () -> Unit,
     onAddFromRecentsClick: () -> Unit,
+    rulesViewModel: RulesViewModel = koinActivityViewModel(),
 ) {
     val context = LocalContext.current
 
-    // --- State Management ---
     var permissionRequest by remember { mutableStateOf<PermissionRequest?>(null) }
 
-    // --- ActivityResult Launchers ---
     val contactPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val contactUri: Uri? = result.data?.data
-            // Use the contactUri to resolve the phone number and add to the list
             contactUri?.let {
                 val contactDetails = context.resolveContactUri(contactUri)
 
@@ -73,7 +73,11 @@ fun AddNumberSheet(
                         "RulesScreen",
                         "Selected Contact: Name=${contactDetails.name}, Number=${contactDetails.phoneNumber}"
                     )
-                    // TODO: viewModel.addNumberToCurrentList(contactDetails)
+
+                    rulesViewModel.addContact(
+                        number = contactDetails.phoneNumber,
+                        name = contactDetails.name,
+                    )
                 } else {
                     Log.w("RulesScreen", "Failed to resolve contact details from URI.")
                 }
@@ -86,12 +90,12 @@ fun AddNumberSheet(
 
     }
 
-    val callLogLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        // TODO: Handle result from our custom call log screen
-        onDismiss()
-    }
+//    val callLogLauncher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.StartActivityForResult()
+//    ) {
+//        // TODO: Handle result from our custom call log screen
+//        onDismiss()
+//    }
 
     val readContactsPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -162,7 +166,8 @@ fun AddNumberSheet(
             }
         },
         onAddManuallyClick = {
-            // TODO: Show a dialog for manual entry
+            onDismiss()
+            rulesViewModel.setShowAddManuallyDialogState(true)
         },
     )
 

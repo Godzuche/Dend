@@ -27,6 +27,7 @@ import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.rules.impl.domain.model.ContactItem
 import com.godzuche.dend.features.rules.impl.domain.model.RulesTab
+import com.godzuche.dend.features.rules.impl.presentation.components.AddManuallyDialog
 import com.godzuche.dend.features.rules.impl.presentation.components.RuleList
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinActivityViewModel
@@ -39,15 +40,19 @@ fun RulesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.getRules()
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.getRules()
+//    }
 
     RulesScreenContent(
         rulesUiState = uiState,
         onAddClick = onAddClick,
         onSelectTab = viewModel::onSelectRulesTab,
-        onRemoveNumberClick = viewModel::onRemoveNumberFromList,
+        onRemoveNumberClick = viewModel::onRemoveContact,
+        onDismissAddManuallyDialog = {
+            viewModel.setShowAddManuallyDialogState(false)
+        },
+        onAddManually = viewModel::addContact,
     )
 }
 
@@ -58,6 +63,8 @@ fun RulesScreenContent(
     onAddClick: () -> Unit,
     onSelectTab: (RulesTab) -> Unit,
     onRemoveNumberClick: (ContactItem) -> Unit,
+    onDismissAddManuallyDialog: () -> Unit,
+    onAddManually: (String, String?) -> Unit,
 ) {
     val selectedTabIndex = remember(rulesUiState.selectedRulesTab) {
         RulesTab.entries.indexOf(rulesUiState.selectedRulesTab)
@@ -67,7 +74,6 @@ fun RulesScreenContent(
     ) { RulesTab.entries.size }
     val scope = rememberCoroutineScope()
 
-    // Sync from ViewModel -> UI
     // When the selectedTabIndex in the ViewModel changes, scroll the pager.
     LaunchedEffect(selectedTabIndex) {
         if (selectedTabIndex != pagerState.currentPage) {
@@ -77,12 +83,22 @@ fun RulesScreenContent(
         }
     }
 
-    // Sync from UI -> ViewModel
     // When the user swipes the pager, update the ViewModel.
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (!pagerState.isScrollInProgress) {
             onSelectTab(RulesTab.entries[pagerState.currentPage])
         }
+    }
+
+
+    if (rulesUiState.showAddManuallyDialog) {
+        AddManuallyDialog(
+            onDismissRequest = onDismissAddManuallyDialog,
+            onConfirm = { number, name ->
+                onAddManually(number, name)
+                onDismissAddManuallyDialog()
+            }
+        )
     }
 
     Scaffold(
