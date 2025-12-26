@@ -80,7 +80,7 @@ fun RulesScreenContent(
     // Sync from UI -> ViewModel
     // When the user swipes the pager, update the ViewModel.
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
-        if (!pagerState.isScrollInProgress) { // To avoid updating while scrolling
+        if (!pagerState.isScrollInProgress) {
             onSelectTab(RulesTab.entries[pagerState.currentPage])
         }
     }
