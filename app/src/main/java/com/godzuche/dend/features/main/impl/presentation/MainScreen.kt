@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.godzuche.dend.core.designsystem.theme.DendTheme
@@ -26,19 +27,22 @@ import com.godzuche.dend.features.activity.impl.navigation.activityEntry
 import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.firewall.impl.navigation.firewallEntry
 import com.godzuche.dend.features.firewall.impl.presentation.DashboardViewModel
+import com.godzuche.dend.features.main.api.navigation.BottomSheetNavKey
+import com.godzuche.dend.features.main.impl.navigation.BottomSheetSceneStrategy
 import com.godzuche.dend.features.main.impl.navigation.MultipleStacksNavigator
 import com.godzuche.dend.features.main.impl.navigation.TOP_LEVEL_MAIN_SCREEN_ROUTES
+import com.godzuche.dend.features.main.impl.navigation.bottomSheetEntry
 import com.godzuche.dend.features.main.impl.navigation.rememberNavigationState
 import com.godzuche.dend.features.main.impl.navigation.toEntries
 import com.godzuche.dend.features.main.impl.presentation.components.DenDNavigationBar
-import com.godzuche.dend.features.rules.api.RulesNavKey
+import com.godzuche.dend.features.rules.api.CallLogNavKey
+import com.godzuche.dend.features.rules.impl.navigation.callLogEntry
 import com.godzuche.dend.features.rules.impl.navigation.rulesEntry
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-//    showOnboardingSuccessMessage: Boolean = false,
     dashboardViewModel: DashboardViewModel = koinActivityViewModel(),
 ) {
     val navigationState = rememberNavigationState(
@@ -47,6 +51,8 @@ fun MainScreen(
     )
 
     val navigator = remember { MultipleStacksNavigator(navigationState) }
+
+    val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
     val entryProvider = entryProvider {
         firewallEntry(
@@ -57,18 +63,29 @@ fun MainScreen(
 //                navigator.navigate(RulesNavKey)
 //            },
         )
-        rulesEntry()
+
+        rulesEntry(
+            onAddClick = {
+                // Open bottom sheet
+                navigator.navigate(BottomSheetNavKey)
+            }
+        )
+
         activityEntry()
+
+        bottomSheetEntry(
+            onDismiss = navigator::goBack,
+            onNavigateToCallLog = {
+                navigator.navigate(CallLogNavKey)
+            },
+        )
+
+        callLogEntry(
+            onBackPress = navigator::goBack,
+        )
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-//    LaunchedEffect(showOnboardingSuccessMessage) {
-//        if (showOnboardingSuccessMessage) {
-//            snackbarHostState.showSnackbar(
-//                message = "Firewall activated!",
-//            )
-//        }
-//    }
 
     val firewallUiState by dashboardViewModel.firewallUiState.collectAsStateWithLifecycle()
 
@@ -103,6 +120,7 @@ fun MainScreen(
                 entryProvider = entryProvider
             ),
             onBack = navigator::goBack,
+            sceneStrategy = bottomSheetStrategy,
             transitionSpec = {
                 fadeIn(
                     animationSpec = tween(durationMillis = 250),

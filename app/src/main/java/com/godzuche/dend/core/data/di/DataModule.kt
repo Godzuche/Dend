@@ -3,7 +3,10 @@ package com.godzuche.dend.core.data.di
 import com.godzuche.dend.core.data.datastore.DenDPreferencesDataSource
 import com.godzuche.dend.core.data.repository.OfflineFirstUserDataRepository
 import com.godzuche.dend.core.domain.repository.UserDataRepository
+import com.godzuche.dend.core.data.PhoneCallDataSource
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -17,6 +20,17 @@ val dataModule = module {
         OfflineFirstUserDataRepository(
             preferencesDataSource = get(),
             ioDispatcher = ioDispatcher,
+        )
+    }
+
+    single<PhoneCallDataSource> {
+        val ioDispatcher = get<CoroutineDispatcher>(named(DendDispatchers.IO))
+        val scope = get<CoroutineScope>(named<ApplicationScope>())
+
+        PhoneCallDataSource(
+            context = androidContext(),
+            ioDispatcher = ioDispatcher,
+            scope = scope,
         )
     }
 }
