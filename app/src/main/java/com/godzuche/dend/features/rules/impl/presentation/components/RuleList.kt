@@ -24,14 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.godzuche.dend.R
-import com.godzuche.dend.features.rules.impl.domain.model.ContactItem
+import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.presentation.RulesState
 
 @Composable
 fun RuleList(
     rulesState: RulesState,
     listType: String,
-    onRemoveNumberClick: (ContactItem) -> Unit,
+    onRemoveNumberClick: (Rule) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -43,7 +43,7 @@ fun RuleList(
             is RulesState.Loading -> CircularProgressIndicator()
 
             is RulesState.Success -> {
-                if (rulesState.contacts.isEmpty()) {
+                if (rulesState.rules.isEmpty()) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.list_alt_24dp),
@@ -72,17 +72,19 @@ fun RuleList(
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
                         items(
-                            items = rulesState.contacts,
+                            items = rulesState.rules,
                             key = { it.number },
-                        ) { contactItem ->
+                        ) { ruleItem ->
                             RuleListItem(
-                                number = contactItem.displayName, // can also use contactItem.displayNameWithNumber
-                                onRemoveClick = { onRemoveNumberClick(contactItem) },
+                                number = ruleItem.displayName, // can also use contactItem.displayNameWithNumber
+                                onRemoveClick = { onRemoveNumberClick(ruleItem) },
                                 modifier = Modifier
                                     .animateItem(),
                             )
 
-                            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
                         }
                     }
                 }

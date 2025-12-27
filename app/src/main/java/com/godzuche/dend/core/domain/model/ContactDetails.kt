@@ -1,10 +1,12 @@
 package com.godzuche.dend.core.domain.model
 
-/**
- * A data class to hold the resolved contact information.
- * This is a clean way to return multiple values from the function.
- */
 data class ContactDetails(
-    val name: String,
-    val phoneNumber: String
-)
+    val phoneNumber: String,
+    val name: String?,
+) {
+    val displayName get() = name ?: phoneNumber
+    val displayNameWithNumber
+        get() = if (!name.isNullOrBlank()) {
+            "$name ($phoneNumber)"
+        } else phoneNumber
+}

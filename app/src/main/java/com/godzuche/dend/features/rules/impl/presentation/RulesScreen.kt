@@ -25,8 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
-import com.godzuche.dend.features.rules.impl.domain.model.ContactItem
-import com.godzuche.dend.features.rules.impl.domain.model.RulesTab
+import com.godzuche.dend.features.rules.impl.domain.model.Rule
+import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.presentation.components.AddManuallyDialog
 import com.godzuche.dend.features.rules.impl.presentation.components.RuleList
 import kotlinx.coroutines.launch
@@ -48,11 +48,11 @@ fun RulesScreen(
         rulesUiState = uiState,
         onAddClick = onAddClick,
         onSelectTab = viewModel::onSelectRulesTab,
-        onRemoveNumberClick = viewModel::onRemoveContact,
+        onRemoveNumberClick = viewModel::onRemoveRule,
         onDismissAddManuallyDialog = {
             viewModel.setShowAddManuallyDialogState(false)
         },
-        onAddManually = viewModel::addContact,
+        onAddManually = viewModel::addRule,
     )
 }
 
@@ -61,17 +61,17 @@ fun RulesScreen(
 fun RulesScreenContent(
     rulesUiState: RulesUiState,
     onAddClick: () -> Unit,
-    onSelectTab: (RulesTab) -> Unit,
-    onRemoveNumberClick: (ContactItem) -> Unit,
+    onSelectTab: (RuleType) -> Unit,
+    onRemoveNumberClick: (Rule) -> Unit,
     onDismissAddManuallyDialog: () -> Unit,
     onAddManually: (String, String?) -> Unit,
 ) {
     val selectedTabIndex = remember(rulesUiState.selectedRulesTab) {
-        RulesTab.entries.indexOf(rulesUiState.selectedRulesTab)
+        RuleType.entries.indexOf(rulesUiState.selectedRulesTab)
     }
     val pagerState = rememberPagerState(
-        initialPage = RulesTab.entries.indexOf(rulesUiState.selectedRulesTab),
-    ) { RulesTab.entries.size }
+        initialPage = RuleType.entries.indexOf(rulesUiState.selectedRulesTab),
+    ) { RuleType.entries.size }
     val scope = rememberCoroutineScope()
 
     // When the selectedTabIndex in the ViewModel changes, scroll the pager.
@@ -86,7 +86,7 @@ fun RulesScreenContent(
     // When the user swipes the pager, update the ViewModel.
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (!pagerState.isScrollInProgress) {
-            onSelectTab(RulesTab.entries[pagerState.currentPage])
+            onSelectTab(RuleType.entries[pagerState.currentPage])
         }
     }
 
@@ -115,15 +115,15 @@ fun RulesScreenContent(
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             SecondaryTabRow(selectedTabIndex = pagerState.currentPage) {
-                RulesTab.entries.forEachIndexed { index, tab ->
+                RuleType.entries.forEachIndexed { index, tab ->
                     Tab(
 //                        selected = pagerState.currentPage == index,
-                        selected = rulesUiState.selectedRulesTab == RulesTab.entries[index],
+                        selected = rulesUiState.selectedRulesTab == RuleType.entries[index],
                         onClick = {
 //                            scope.launch {
 //                                pagerState.animateScrollToPage(index)
 //                            }
-                            onSelectTab(RulesTab.entries[index])
+                            onSelectTab(RuleType.entries[index])
                         },
                         text = {
                             Text(tab.title)
@@ -134,7 +134,7 @@ fun RulesScreenContent(
 
             RulesScreenPager(pagerState) { entry ->
                 when (entry) {
-                    RulesTab.BLACKLIST -> {
+                    RuleType.BLACKLIST -> {
                         RuleList(
                             rulesState = rulesUiState.blacklistState,
                             listType = entry.title,
@@ -142,7 +142,7 @@ fun RulesScreenContent(
                         )
                     }
 
-                    RulesTab.WHITELIST -> {
+                    RuleType.WHITELIST -> {
                         RuleList(
                             rulesState = rulesUiState.whitelistState,
                             listType = entry.title,
@@ -158,13 +158,13 @@ fun RulesScreenContent(
 @Composable
 fun RulesScreenPager(
     pagerState: PagerState,
-    pageContent: @Composable (RulesTab) -> Unit,
+    pageContent: @Composable (RuleType) -> Unit,
 ) {
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
     ) { page ->
-        val entry = RulesTab.entries[page]
+        val entry = RuleType.entries[page]
         pageContent(entry)
     }
 }

@@ -74,7 +74,7 @@ fun AddNumberSheet(
                         "Selected Contact: Name=${contactDetails.name}, Number=${contactDetails.phoneNumber}"
                     )
 
-                    rulesViewModel.addContact(
+                    rulesViewModel.addRule(
                         number = contactDetails.phoneNumber,
                         name = contactDetails.name,
                     )
