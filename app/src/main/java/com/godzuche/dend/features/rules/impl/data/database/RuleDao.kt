@@ -28,4 +28,11 @@ interface RuleDao {
      */
     @Query("SELECT * FROM rules WHERE type = :ruleType ORDER BY createdAt DESC")
     fun getRules(ruleType: RuleType): Flow<List<RuleEntity>>
+
+    @Query("SELECT COUNT(*) > 0 FROM rules WHERE number = :number AND type = 'BLACKLIST'")
+    suspend fun isNumberInBlacklist(number: String): Boolean
+
+    @Query("SELECT COUNT(*) > 0 FROM rules WHERE number = :number AND type = 'WHITELIST'")
+    suspend fun isNumberInWhitelist(number: String): Boolean
+
 }

@@ -12,8 +12,10 @@ import android.telecom.Call
 import android.telecom.CallScreeningService
 import android.telecom.Connection
 import android.util.Log
+import com.godzuche.dend.core.data.utils.PhoneNumberNormalizer
 import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.core.domain.repository.UserDataRepository
+import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
@@ -43,11 +45,9 @@ fun Context.bindMyService() {
 
 class ScreeningService : CallScreeningService(), KoinComponent {
     val userDataRepository by inject<UserDataRepository>()
-//    val scope by inject<CoroutineScope>()
-//    val ioDispatcher by inject<CoroutineDispatcher>(named(DendDispatchers.IO))
+    val rulesRepository by inject<RulesRepository>()
+    val phoneNumberNormalizer by inject<PhoneNumberNormalizer>()
 
-    // This function is called when an ingoing or outgoing call
-    // is from a number not in the user's contacts list
     override fun onScreenCall(callDetails: Call.Details) {
         val firewallState = runBlocking {
             userDataRepository
@@ -66,7 +66,7 @@ class ScreeningService : CallScreeningService(), KoinComponent {
 //            val handle: Uri = callDetails.handle
             // Extract the incoming phone number
             val incomingNumber = extractPhoneNumber(callDetails)
-            Log.d("MyCallScreeningService", "Incoming Call = $incomingNumber")
+            Log.d("MyCallScreeningService", "Incoming Call number = $incomingNumber")
 
             // determine if you want to allow or reject the call
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -98,30 +98,121 @@ class ScreeningService : CallScreeningService(), KoinComponent {
                 }
             }
 
+            if (firewallState == FirewallState.OFF) {
+                allowCall(callDetails)
+                return
+            }
 
-            // To disallow (but not rejected) and send to voicemail - Soft Block (Still blocks network)
-            val blockAndAcceptResponse = CallResponse.Builder()
-                .setDisallowCall(true)
-                .setRejectCall(false)
-                .setSkipCallLog(true) // Recommended
-                .setSkipNotification(true) // Recommended
-                .build()
+            if (incomingNumber.isNullOrBlank()) {
+                Log.d(
+                    "MyCallScreeningService",
+                    "Incoming Call = number = $incomingNumber Blocking call"
+                )
+                blockCall(callDetails) // it is null for private numbers with hidden caller id
+            } else {
+                val normalizationResult = phoneNumberNormalizer.normalize(incomingNumber)
+                normalizationResult.fold(
+                    onSuccess = { normalizedNumber ->
+                        Log.d(
+                            "MyCallScreeningService",
+                            "Incoming Call normalized = $normalizedNumber"
+                        )
+                        // The incoming number was successfully parsed. Check against rules.
+                        runBlocking {
+                            when (firewallState) {
+                                FirewallState.OFF -> allowCall(callDetails)
 
-            // To disallow and hang up (reject) - Hard Block
-            val blockAndRejectResponse = CallResponse.Builder()
-                .setDisallowCall(true)
-                .setRejectCall(true) // This hangs up the call
-                .setSkipCallLog(true)
-                .setSkipNotification(true)
-                .build()
+                                FirewallState.ON -> {
+                                    if (rulesRepository.isBlacklisted(normalizedNumber)) {
+                                        Log.d("MyCallScreeningService", "blacklisted. blocking...")
+                                        blockCall(callDetails)
+                                    } else {
+                                        Log.d(
+                                            "MyCallScreeningService",
+                                            "not blacklisted. allowed..."
+                                        )
+                                        allowCall(callDetails)
+                                    }
+                                }
 
-            // Allow, but silent like DND
-            val allowAndSilentResponse =
-                CallResponse.Builder()
-                    .setSilenceCall(true)
-                    .build()
+                                FirewallState.ZEN -> {
+                                    if (rulesRepository.isWhitelisted(normalizedNumber)) {
+                                        Log.d("MyCallScreeningService", "whitelisted. allowed...")
+                                        allowCall(callDetails)
+                                    } else {
+                                        Log.d(
+                                            "MyCallScreeningService",
+                                            "not whitelisted. blocking..."
+                                        )
+                                        blockCall(callDetails)
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    onFailure = { failure ->
+                        // If the incoming number is invalid or can't be parsed,
+                        // it is always safer to allow the call than to block it incorrectly.
+                        Log.w(
+                            "MyCallScreeningService",
+                            "Could not parse incoming number. Allowing call. Reason: $failure"
+                        )
+                        allowCall(callDetails)
+                    }
+                )
+            }
 
-            val normalResponse = CallResponse.Builder()
+
+        }
+//        }
+    }
+
+    private fun extractPhoneNumber(callDetails: Call.Details): String? {
+        val handle = callDetails.handle
+        if (handle != null) {
+            // Attempt to extract phone number from the handle
+            return handle.schemeSpecificPart
+        } else {
+            // Handle is null, try other methods if available
+            val gatewayInfo = callDetails.gatewayInfo
+            if (gatewayInfo != null) {
+                return gatewayInfo.originalAddress.schemeSpecificPart
+            }
+        }
+        return null
+    }
+
+    private fun blockCall(callDetails: Call.Details) {
+        respondToCall(callDetails, blockAndRejectResponse)
+    }
+
+    private fun allowCall(callDetails: Call.Details) {
+        respondToCall(callDetails, normalResponse)
+    }
+
+    // To disallow (but not rejected) and send to voicemail - Soft Block (Still blocks network)
+    val blockAndAcceptResponse = CallResponse.Builder()
+        .setDisallowCall(true)
+        .setRejectCall(false)
+        .setSkipCallLog(true) // Recommended
+        .setSkipNotification(true) // Recommended
+        .build()
+
+    // To disallow and hang up (reject) - Hard Block
+    val blockAndRejectResponse = CallResponse.Builder()
+        .setDisallowCall(true)
+        .setRejectCall(true) // This hangs up the call
+        .setSkipCallLog(true)
+        .setSkipNotification(true)
+        .build()
+
+    // Allow, but silent like DND
+    val allowAndSilentResponse =
+        CallResponse.Builder()
+            .setSilenceCall(true)
+            .build()
+
+    val normalResponse = CallResponse.Builder()
 //                // Sets whether the incoming call should be blocked.
 //                .setDisallowCall(false)
 //                // Sets whether the incoming call should be rejected as if the user did so manually.
@@ -132,61 +223,9 @@ class ScreeningService : CallScreeningService(), KoinComponent {
 //                .setSkipCallLog(false)
 //                // Sets whether a missed call notification should not be shown for the incoming call.
 //                .setSkipNotification(false)
-                .build()
-
-            when (firewallState) {
-                FirewallState.OFF -> {
-                    respondToCall(callDetails, normalResponse)
-                }
-
-                FirewallState.ON -> {
-                    if (isNumberInBlacklist(incomingNumber)) {
-                        respondToCall(callDetails, blockAndRejectResponse)
-                    } else {
-                        respondToCall(callDetails, normalResponse)
-                    }
-                }
-
-                FirewallState.ZEN -> {
-                    if (isNumberInWhitelist(incomingNumber)) {
-                        respondToCall(callDetails, normalResponse)
-                    } else {
-                        respondToCall(callDetails, blockAndRejectResponse)
-                    }
-                }
-            }
-        }
-//        }
-    }
-}
-
-// Todo: Replace with repository calls
-private fun isNumberInBlacklist(number: String?): Boolean {
-    return number?.let {
-        true
-    } ?: true
-}
-
-private fun isNumberInWhitelist(number: String?): Boolean {
-    return number?.let { num ->
-        false
-    } ?: false
-}
+        .build()
 
 
-private fun extractPhoneNumber(callDetails: Call.Details): String? {
-    val handle = callDetails.handle
-    if (handle != null) {
-        // Attempt to extract phone number from the handle
-        return handle.schemeSpecificPart
-    } else {
-        // Handle is null, try other methods if available
-        val gatewayInfo = callDetails.gatewayInfo
-        if (gatewayInfo != null) {
-            return gatewayInfo.originalAddress.schemeSpecificPart
-        }
-    }
-    return null
 }
 
 val CALL_SCREENING_PERMISSIONS = arrayOf(

@@ -2,8 +2,8 @@ package com.godzuche.dend.features.rules.impl.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -68,12 +68,12 @@ private fun CustomCallLogScreenContent(
                     }
                 }
             )
-        }
-    ) { paddingValues ->
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { _ ->
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             when (uiState) {
@@ -90,7 +90,6 @@ private fun CustomCallLogScreenContent(
                             contentPadding = PaddingValues(vertical = 8.dp)
                         ) {
                             items(items = uiState.callLogs) { callLog ->
-                                println("CallLogItem: $callLog")
                                 CallLogListItem(
                                     item = callLog,
                                     onAddClick = {
