@@ -72,45 +72,6 @@ class RulesViewModel(
         initialValue = _uiState.value,
     )
 
-    /*    init {
-            getRules()
-        }
-
-        fun getRules() {
-            viewModelScope.launch {
-                _uiState.update {
-                    it.copy(
-                        blacklistState = RulesState.Loading,
-                        whitelistState = RulesState.Loading,
-                    )
-                }
-
-                async {
-                    val dummyBlacklist = listOf("(123) 456-7890", "Spam Caller", "(555) 867-5309")
-                        .map { ContactDetails(phoneNumber = it, name = it) }
-
-                    delay(500)
-                    _uiState.update {
-                        it.copy(
-                            blacklistState = RulesState.Success(dummyBlacklist),
-                        )
-                    }
-                }.await()
-
-                async {
-                    val dummyWhitelist = listOf("(234) 456-7890", "Chief Alex", "(222) 867-5309")
-                        .map { ContactDetails(phoneNumber = it, name = it) }
-
-                    delay(500)
-                    _uiState.update {
-                        it.copy(
-                            whitelistState = RulesState.Success(dummyWhitelist),
-                        )
-                    }
-                }.await()
-            }
-        }*/
-
     fun loadCallLog() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(callLogUiState = CallLogUiState.Loading) }
