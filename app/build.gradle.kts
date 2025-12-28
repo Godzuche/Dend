@@ -126,4 +126,6 @@ dependencies {
     testImplementation(libs.androidx.room.testing)
     implementation(libs.androidx.room.paging)
 
+    implementation("com.googlecode.libphonenumber:libphonenumber:9.0.21")
+
 }

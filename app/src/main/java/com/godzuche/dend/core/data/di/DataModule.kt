@@ -3,6 +3,7 @@ package com.godzuche.dend.core.data.di
 import com.godzuche.dend.core.data.PhoneCallDataSource
 import com.godzuche.dend.core.data.datastore.DenDPreferencesDataSource
 import com.godzuche.dend.core.data.repository.OfflineFirstUserDataRepository
+import com.godzuche.dend.core.data.utils.PhoneNumberNormalizer
 import com.godzuche.dend.core.domain.repository.UserDataRepository
 import com.godzuche.dend.features.rules.impl.data.repository.RulesRepositoryImpl
 import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
@@ -38,4 +39,8 @@ val dataModule = module {
     }
 
     singleOf(::RulesRepositoryImpl).bind<RulesRepository>()
+
+    single {
+        PhoneNumberNormalizer(context = androidContext())
+    }
 }
