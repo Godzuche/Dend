@@ -1,7 +1,11 @@
 package com.godzuche.dend.features.rules.impl.data.repository
 
+import android.database.sqlite.SQLiteException
 import android.util.Log
+import com.godzuche.dend.core.data.utils.NormalizationException
 import com.godzuche.dend.core.data.utils.PhoneNumberNormalizer
+import com.godzuche.dend.core.domain.utils.DataError
+import com.godzuche.dend.core.domain.utils.Result
 import com.godzuche.dend.features.rules.impl.data.database.RuleDao
 import com.godzuche.dend.features.rules.impl.data.database.RuleEntity
 import com.godzuche.dend.features.rules.impl.data.mappers.toDomainModel
@@ -26,26 +30,46 @@ class RulesRepositoryImpl(
         ruleDao.getRules(RuleType.WHITELIST)
             .map { it.map(RuleEntity::toDomainModel) }
 
-    override suspend fun addRule(number: String, name: String?, type: RuleType) {
-        phoneNumberNormalizer.normalize(number)
-            .onSuccess { normalizedNumber ->
-                Log.d("RulesRepository", "Upserting rule for $normalizedNumber")
-                val rule = RuleEntity(
-                    number = normalizedNumber,
-                    name = name,
-                    type = type,
-                    createdAt = Clock.System.now()
+    override suspend fun addRule(
+        number: String,
+        name: String?,
+        type: RuleType,
+    ): Result<Unit, DataError.Local> {
+        val normalizationResult = phoneNumberNormalizer.normalize(number)
+
+        val normalizedNumber = normalizationResult.getOrNull()
+            ?: return Result.Error(
+                DataError.Local.NormalizationError(
+                    originalNumber = number,
+                    exception = normalizationResult.exceptionOrNull()!! as NormalizationException,
                 )
-                ruleDao.upsert(rule)
-            }
-            .onFailure { failure ->
-                Log.w("RulesRepository", "Could not add rule for '$number'. Reason: $failure")
-//            // Todo: Send Error to the ui
-            }
+            )
+
+        return try {
+            Log.d("RulesRepository", "Upserting rule for $normalizedNumber")
+            val rule = RuleEntity(
+                number = normalizedNumber,
+                name = name,
+                type = type,
+                createdAt = Clock.System.now()
+            )
+            ruleDao.upsert(rule)
+            Result.Success(Unit)
+        } catch (e: SQLiteException) {
+            Log.e("RulesRepository", "Database error while adding rule", e)
+            Result.Error(DataError.Local.DatabaseError(e))
+        }
+
     }
 
-    override suspend fun removeRule(rule: Rule) {
-        ruleDao.delete(rule.toEntity())
+    override suspend fun removeRule(rule: Rule): Result<Unit, DataError.Local> {
+        return try {
+            ruleDao.delete(rule.toEntity())
+            Result.Success(Unit)
+        } catch (e: SQLiteException) {
+            Log.e("RulesRepository", "Database error while removing rule", e)
+            Result.Error(DataError.Local.DatabaseError(e))
+        }
     }
 
     override suspend fun isBlacklisted(number: String?): Boolean {

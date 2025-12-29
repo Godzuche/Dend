@@ -8,11 +8,10 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 
 /**
  * A sealed class representing the different reasons why phone number normalization can fail.
- * Using a sealed class provides more context than a simple null or a generic exception.
  */
-sealed class NormalizationFailure : Throwable() {
-    data object BlankNumber : NormalizationFailure()
-    data class InvalidNumber(val reason: String) : NormalizationFailure()
+sealed class NormalizationException : Throwable() {
+    data object BlankNumber : NormalizationException()
+    data class InvalidNumber(val reason: String) : NormalizationException()
 }
 
 /**
@@ -35,7 +34,7 @@ class PhoneNumberNormalizer(
     fun normalize(number: String): /*String?*/ Result<String> {
         if (number.isBlank()) {
 //            return null
-            return Result.failure(NormalizationFailure.BlankNumber)
+            return Result.failure(NormalizationException.BlankNumber)
         }
 
         // Get the user's current country code (e.g., "US", "NG", "GB"). This is crucial.
@@ -58,7 +57,7 @@ class PhoneNumberNormalizer(
             } else {
 //                null
                 Result.failure(
-                    NormalizationFailure.InvalidNumber(
+                    NormalizationException.InvalidNumber(
                         "The number is not considered possible."
                     )
                 )
@@ -71,7 +70,7 @@ class PhoneNumberNormalizer(
             )
 //            null
             Result.failure(
-                NormalizationFailure.InvalidNumber(
+                NormalizationException.InvalidNumber(
                     e.message ?: "Unknown parsing error"
                 )
             )
@@ -84,7 +83,8 @@ class PhoneNumberNormalizer(
      */
     private fun getDeviceCountryCode(): String {
         return try {
-            val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            val telephonyManager =
+                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             // The network country is often more reliable than the SIM country.
             val countryCode = telephonyManager.networkCountryIso?.uppercase()
 
@@ -95,7 +95,11 @@ class PhoneNumberNormalizer(
                 countryCode
             }
         } catch (e: Exception) {
-            Log.w("PhoneNumberNormalizer", "Could not get country code from TelephonyManager. Falling back to locale.", e)
+            Log.w(
+                "PhoneNumberNormalizer",
+                "Could not get country code from TelephonyManager. Falling back to locale.",
+                e
+            )
             context.resources.configuration.locales.get(0).country.uppercase()
         }
     }

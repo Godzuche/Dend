@@ -34,10 +34,7 @@ fun CallLogListItem(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = item.contactName
-                    ?.takeIf {
-                        it.isNotBlank()
-                    } ?: item.phoneNumber,
+                text = item.displayName,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )

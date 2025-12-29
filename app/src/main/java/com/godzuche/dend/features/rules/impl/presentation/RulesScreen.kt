@@ -3,13 +3,9 @@ package com.godzuche.dend.features.rules.impl.presentation
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -19,34 +15,71 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
+import com.godzuche.dend.core.presentation.UiEvent
+import com.godzuche.dend.core.presentation.UiText
+import com.godzuche.dend.core.presentation.messaging.UiEventBus
+import com.godzuche.dend.core.presentation.utils.ObserveAsEvent
+import com.godzuche.dend.core.presentation.utils.toUiText
 import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.presentation.components.AddManuallyDialog
 import com.godzuche.dend.features.rules.impl.presentation.components.RuleList
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RulesScreen(
-    onAddClick: () -> Unit,
     viewModel: RulesViewModel = koinActivityViewModel(),
+    uiEventBus: UiEventBus = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-//    LaunchedEffect(Unit) {
-//        viewModel.getRules()
-//    }
+    ObserveAsEvent(
+        flow = viewModel.events,
+    ) { event ->
+        val uiEvent = when (event) {
+            is RulesUiEvent.RuleAdded -> {
+                val text =
+                    UiText.StringResource(
+                        R.string.rule_added_successfully,
+                        listOf(
+                            event.number,
+                            event.selectedRulesTab.title,
+                        )
+                    )
+                UiEvent.ShowSnackbar(text)
+            }
+
+            is RulesUiEvent.RuleRemoved -> {
+                val text =
+                    UiText.StringResource(
+                        R.string.rule_removed_successfully,
+                        listOf(
+                            event.contactLabel,
+                            event.selectedRulesTab.title,
+                        ),
+                    )
+                UiEvent.ShowSnackbar(text)
+            }
+
+            is RulesUiEvent.OperationFailed -> {
+                val text = event.error.toUiText()
+                UiEvent.ShowSnackbar(text)
+            }
+        }
+
+        uiEventBus.sendEvent(uiEvent)
+
+    }
 
     RulesScreenContent(
         rulesUiState = uiState,
-        onAddClick = onAddClick,
         onSelectTab = viewModel::onSelectRulesTab,
         onRemoveNumberClick = viewModel::onRemoveRule,
         onDismissAddManuallyDialog = {
@@ -60,7 +93,6 @@ fun RulesScreen(
 @Composable
 fun RulesScreenContent(
     rulesUiState: RulesUiState,
-    onAddClick: () -> Unit,
     onSelectTab: (RuleType) -> Unit,
     onRemoveNumberClick: (Rule) -> Unit,
     onDismissAddManuallyDialog: () -> Unit,
@@ -101,54 +133,40 @@ fun RulesScreenContent(
         )
     }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddClick,
-            ) {
-                Icon(
-                    ImageVector.vectorResource(R.drawable.add_24dp),
-                    contentDescription = "Add Number",
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        SecondaryTabRow(selectedTabIndex = pagerState.currentPage) {
+            RuleType.entries.forEachIndexed { index, tab ->
+                Tab(
+                    selected = rulesUiState.selectedRulesTab == RuleType.entries[index],
+                    onClick = {
+                        onSelectTab(RuleType.entries[index])
+                    },
+                    text = {
+                        Text(tab.title)
+                    },
                 )
             }
         }
-    ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            SecondaryTabRow(selectedTabIndex = pagerState.currentPage) {
-                RuleType.entries.forEachIndexed { index, tab ->
-                    Tab(
-//                        selected = pagerState.currentPage == index,
-                        selected = rulesUiState.selectedRulesTab == RuleType.entries[index],
-                        onClick = {
-//                            scope.launch {
-//                                pagerState.animateScrollToPage(index)
-//                            }
-                            onSelectTab(RuleType.entries[index])
-                        },
-                        text = {
-                            Text(tab.title)
-                        },
+
+        RulesScreenPager(pagerState) { entry ->
+            when (entry) {
+                RuleType.BLACKLIST -> {
+                    RuleList(
+                        rulesState = rulesUiState.blacklistState,
+                        listType = entry.title,
+                        onRemoveNumberClick = onRemoveNumberClick,
                     )
                 }
-            }
 
-            RulesScreenPager(pagerState) { entry ->
-                when (entry) {
-                    RuleType.BLACKLIST -> {
-                        RuleList(
-                            rulesState = rulesUiState.blacklistState,
-                            listType = entry.title,
-                            onRemoveNumberClick = onRemoveNumberClick,
-                        )
-                    }
-
-                    RuleType.WHITELIST -> {
-                        RuleList(
-                            rulesState = rulesUiState.whitelistState,
-                            listType = entry.title,
-                            onRemoveNumberClick = onRemoveNumberClick,
-                        )
-                    }
+                RuleType.WHITELIST -> {
+                    RuleList(
+                        rulesState = rulesUiState.whitelistState,
+                        listType = entry.title,
+                        onRemoveNumberClick = onRemoveNumberClick,
+                    )
                 }
             }
         }
@@ -172,5 +190,11 @@ fun RulesScreenPager(
 @Preview(showBackground = true, device = "id:pixel_6")
 @Composable
 private fun RulesScreenPreview() = DendTheme {
-    RulesScreen({})
+    RulesScreenContent(
+        rulesUiState = RulesUiState(),
+        onSelectTab = {},
+        onRemoveNumberClick = {},
+        onDismissAddManuallyDialog = {},
+        onAddManually = { _, _ -> },
+    )
 }

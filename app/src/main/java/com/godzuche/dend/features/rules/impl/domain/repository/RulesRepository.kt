@@ -1,5 +1,7 @@
 package com.godzuche.dend.features.rules.impl.domain.repository
 
+import com.godzuche.dend.core.domain.utils.DataError
+import com.godzuche.dend.core.domain.utils.Result
 import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import kotlinx.coroutines.flow.Flow
@@ -14,12 +16,16 @@ interface RulesRepository {
     /**
      * Adds a new rule to the database.
      */
-    suspend fun addRule(number: String, name: String?, type: RuleType)
+    suspend fun addRule(
+        number: String,
+        name: String?,
+        type: RuleType,
+    ): Result<Unit, DataError.Local>
 
     /**
      * Removes a rule from the database.
      */
-    suspend fun removeRule(rule: Rule)
+    suspend fun removeRule(rule: Rule): Result<Unit, DataError.Local>
 
     /**
      * Checks if a normalized phone number is present in the blacklist.

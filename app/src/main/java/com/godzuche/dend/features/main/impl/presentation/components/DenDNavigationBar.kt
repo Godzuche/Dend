@@ -1,6 +1,7 @@
 package com.godzuche.dend.features.main.impl.presentation.components
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
@@ -11,6 +12,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation3.runtime.NavKey
 import com.godzuche.dend.core.designsystem.theme.DendTheme
+import com.godzuche.dend.core.presentation.utils.nonScaledSp
 import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.main.impl.navigation.TOP_LEVEL_MAIN_SCREEN_ROUTES
 
@@ -35,7 +37,11 @@ fun DenDNavigationBar(
                     )
                 },
                 label = {
-                    Text(navBarItem.title)
+                    Text(
+                        text = navBarItem.title,
+                        fontSize = LocalTextStyle.current.fontSize.nonScaledSp,
+                        lineHeight = LocalTextStyle.current.lineHeight.nonScaledSp,
+                    )
                 },
             )
         }

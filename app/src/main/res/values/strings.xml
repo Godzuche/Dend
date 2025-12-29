@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">Dend</string>
+
+    <string name="rule_added_successfully">"%1$s was added successfully to %2$s."</string>
+    <string name="rule_removed_successfully">"%1$s was removed successfully from %2$s."</string>
+
+    <string name="error_database">"Could not save changes. Please try again."</string>
+    <string name="error_invalid_number">"Could not add \"%1$s\". Please enter a valid phone number."</string>
+    <string name="error_unknown">"An unexpected error occurred. Please try again."</string>
+    <string name="error_no_internet">"No internet connection. Please check your network."</string>
+    <string name="error_server">"Could not connect to the server. Please try again later."</string>
+
+    <string name="permission_primer_contacts_title">"Allow Contact Access?"</string>
+    <string name="permission_primer_contacts_text">"To let you choose a number directly from your contacts, DeeNDee needs permission to read them. Your contacts are not stored or uploaded."</string>
+
+    <string name="permission_primer_call_log_title">"Allow Call Log Access?"</string>
+    <string name="permission_primer_call_log_text">"To let you add a number from your recent calls and to keep your call history clean, DeeNDee needs access to your call log."</string>
+
+    <string name="dialog_allow">"Allow"</string>
+    <string name="dialog_cancel">"Cancel"</string>
+    <string name="dialog_add">"Add"</string>
+
 </resources>

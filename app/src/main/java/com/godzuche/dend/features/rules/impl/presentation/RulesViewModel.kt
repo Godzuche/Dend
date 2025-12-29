@@ -6,16 +6,37 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.dend.core.data.PhoneCallDataSource
 import com.godzuche.dend.core.domain.model.CallLogItem
+import com.godzuche.dend.core.domain.utils.DataError
+import com.godzuche.dend.core.domain.utils.onError
+import com.godzuche.dend.core.domain.utils.onSuccess
+import com.godzuche.dend.core.presentation.messaging.UiEventBus
 import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+sealed interface RulesUiEvent {
+    data class RuleAdded(
+        val number: String,
+        val selectedRulesTab: RuleType,
+    ) : RulesUiEvent
+
+    data class RuleRemoved(
+        val contactLabel: String,
+        val selectedRulesTab: RuleType,
+    ) : RulesUiEvent
+
+    data class OperationFailed(val error: DataError) : RulesUiEvent
+}
 
 @Stable
 sealed interface CallLogUiState {
@@ -50,7 +71,11 @@ data class RulesUiState(
 class RulesViewModel(
     private val phoneCallDataSource: PhoneCallDataSource,
     private val rulesRepository: RulesRepository,
+    private val uiEventBus: UiEventBus,
 ) : ViewModel() {
+
+    private val eventChannel = Channel<RulesUiEvent>()
+    val events = eventChannel.receiveAsFlow()
 
     private val _uiState = MutableStateFlow(RulesUiState())
     val uiState = combine(
@@ -73,10 +98,12 @@ class RulesViewModel(
     )
 
     fun loadCallLog() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _uiState.update { it.copy(callLogUiState = CallLogUiState.Loading) }
 
-            val callLogItems = phoneCallDataSource.loadCallLog(limit = 100)
+            val callLogItems = async(Dispatchers.Default) {
+                phoneCallDataSource.loadCallLog(limit = 100)
+            }.await()
 
             _uiState.update {
                 it.copy(callLogUiState = CallLogUiState.Success(callLogs = callLogItems))
@@ -93,6 +120,19 @@ class RulesViewModel(
     fun onRemoveRule(ruleItem: Rule) {
         viewModelScope.launch {
             rulesRepository.removeRule(ruleItem)
+                .onSuccess {
+                    eventChannel.send(
+                        RulesUiEvent.RuleRemoved(
+                            ruleItem.run { name ?: number },
+                            uiState.value.selectedRulesTab,
+                        )
+                    )
+                }
+                .onError { error ->
+                    eventChannel.send(
+                        RulesUiEvent.OperationFailed(error)
+                    )
+                }
         }
     }
 
@@ -104,13 +144,33 @@ class RulesViewModel(
         }
     }
 
-    fun addRule(number: String, name: String?) {
+    fun addRule(number: String?, name: String?) {
         viewModelScope.launch {
+//            if (number == null) {
+//                val message = UiText.DynamicString("Cannot add a private number")
+//                messenger.showMessage(message)
+//                return@launch
+//            }
+
             rulesRepository.addRule(
-                number = number,
+                number = number ?: "",
                 name = name,
                 type = uiState.value.selectedRulesTab,
             )
+                .onSuccess {
+                    eventChannel.send(
+                        RulesUiEvent.RuleAdded(
+                            name ?: number!!,
+                            uiState.value.selectedRulesTab,
+                        )
+                    )
+                }
+                .onError { error ->
+                    eventChannel.send(
+                        RulesUiEvent.OperationFailed(error)
+                    )
+                }
+
         }
     }
 

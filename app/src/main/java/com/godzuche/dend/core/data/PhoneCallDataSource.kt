@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.CallLog
 import android.provider.ContactsContract
 import android.util.Log
+import androidx.core.database.getStringOrNull
 import com.godzuche.dend.core.domain.model.CallLogItem
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -51,15 +52,14 @@ class PhoneCallDataSource(
 
                     // Limit to the most recent limit number of calls for performance and relevance
                     while (cursor.moveToNext() && callLogItems.size < limit) {
-                        val number = cursor.getString(numberIndex)
+                        val number = cursor.getStringOrNull(numberIndex)
                         val dateMillis = cursor.getLong(dateIndex)
-                        val cachedName = cursor.getString(nameIndex)
+                        val cachedName = cursor.getStringOrNull(nameIndex)
                         val type = cursor.getInt(typeIndex)
 
                         val displayName: String? = if (!cachedName.isNullOrBlank()) {
                             cachedName
                         } else {
-                            // The cached name is empty or null.
                             // Perform a manual, real-time lookup.
                             findContactName(number)
                         }
@@ -68,8 +68,16 @@ class PhoneCallDataSource(
                             CallLog.Calls.INCOMING_TYPE -> "Incoming"
                             CallLog.Calls.OUTGOING_TYPE -> "Outgoing"
                             CallLog.Calls.MISSED_TYPE -> "Missed"
+                            CallLog.Calls.REJECTED_TYPE -> "Rejected"
+                            CallLog.Calls.BLOCKED_TYPE -> "Blocked"
+                            CallLog.Calls.VOICEMAIL_TYPE -> "Voicemail"
+                            CallLog.Calls.ANSWERED_EXTERNALLY_TYPE -> "Answered externally"
                             else -> "Unknown"
                         }
+
+//                        val contactName = displayName?.takeIf { it.isNotBlank() }
+//                            ?: number?.takeIf { it.isNotBlank() }
+//                            ?: "Private number"
 
                         callLogItems.add(
                             CallLogItem(
@@ -107,8 +115,8 @@ class PhoneCallDataSource(
      * @return The contact's display name if a match is found, otherwise null.
      */
     @SuppressLint("MissingPermission") // Permissions should be checked by the calling code before invoking this.
-    fun findContactName(phoneNumber: String): String? {
-        if (phoneNumber.isBlank()) {
+    fun findContactName(phoneNumber: String?): String? {
+        if (phoneNumber.isNullOrBlank()) {
             return null
         }
         var contactName: String? = null
