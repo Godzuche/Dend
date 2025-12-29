@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.godzuche.dend.R
 import com.godzuche.dend.features.rules.impl.domain.model.Rule
-import com.godzuche.dend.features.rules.impl.presentation.RulesState
+import com.godzuche.dend.features.rules.impl.presentation.state.RulesState
 
 @Composable
 fun RuleList(

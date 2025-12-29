@@ -28,6 +28,7 @@ import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.presentation.components.AddManuallyDialog
 import com.godzuche.dend.features.rules.impl.presentation.components.RuleList
+import com.godzuche.dend.features.rules.impl.presentation.state.RulesUiState
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel

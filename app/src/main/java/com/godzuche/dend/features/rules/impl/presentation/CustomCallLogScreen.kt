@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.features.rules.impl.presentation.components.CallLogListItem
+import com.godzuche.dend.features.rules.impl.presentation.state.CallLogUiState
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
