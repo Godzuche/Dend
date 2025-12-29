@@ -1,18 +1,17 @@
 package com.godzuche.dend.features.rules.impl.presentation
 
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.dend.core.data.PhoneCallDataSource
-import com.godzuche.dend.core.domain.model.CallLogItem
-import com.godzuche.dend.core.domain.utils.DataError
 import com.godzuche.dend.core.domain.utils.onError
 import com.godzuche.dend.core.domain.utils.onSuccess
 import com.godzuche.dend.core.presentation.messaging.UiEventBus
 import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
+import com.godzuche.dend.features.rules.impl.presentation.state.CallLogUiState
+import com.godzuche.dend.features.rules.impl.presentation.state.RulesState
+import com.godzuche.dend.features.rules.impl.presentation.state.RulesUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -23,50 +22,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-sealed interface RulesUiEvent {
-    data class RuleAdded(
-        val number: String,
-        val selectedRulesTab: RuleType,
-    ) : RulesUiEvent
-
-    data class RuleRemoved(
-        val contactLabel: String,
-        val selectedRulesTab: RuleType,
-    ) : RulesUiEvent
-
-    data class OperationFailed(val error: DataError) : RulesUiEvent
-}
-
-@Stable
-sealed interface CallLogUiState {
-    data object Loading : CallLogUiState
-
-    @Immutable
-    data class Success(
-        val callLogs: List<CallLogItem>
-    ) : CallLogUiState
-}
-
-@Stable
-sealed interface RulesState {
-    data object Loading : RulesState
-
-    @Immutable
-    data class Success(
-        override val rules: List<Rule>
-    ) : RulesState
-
-    val rules get() = emptyList<Rule>()
-}
-
-data class RulesUiState(
-    val selectedRulesTab: RuleType = RuleType.BLACKLIST,
-    val blacklistState: RulesState = RulesState.Loading,
-    val whitelistState: RulesState = RulesState.Loading,
-    val callLogUiState: CallLogUiState = CallLogUiState.Loading,
-    val showAddManuallyDialog: Boolean = false,
-)
 
 class RulesViewModel(
     private val phoneCallDataSource: PhoneCallDataSource,
