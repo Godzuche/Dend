@@ -17,67 +17,61 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
-import com.godzuche.dend.core.presentation.UiEvent
-import com.godzuche.dend.core.presentation.UiText
-import com.godzuche.dend.core.presentation.messaging.UiEventBus
-import com.godzuche.dend.core.presentation.utils.ObserveAsEvent
-import com.godzuche.dend.core.presentation.utils.toUiText
 import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.presentation.components.AddManuallyDialog
 import com.godzuche.dend.features.rules.impl.presentation.components.RuleList
 import com.godzuche.dend.features.rules.impl.presentation.state.RulesUiState
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RulesScreen(
     viewModel: RulesViewModel = koinActivityViewModel(),
-    uiEventBus: UiEventBus = koinInject(),
+//    uiEventBus: UiEventBus = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ObserveAsEvent(
-        flow = viewModel.events,
-    ) { event ->
-        val uiEvent = when (event) {
-            is RulesUiEvent.RuleAdded -> {
-                val text =
-                    UiText.StringResource(
-                        R.string.rule_added_successfully,
-                        listOf(
-                            event.number,
-                            event.selectedRulesTab.title,
-                        )
-                    )
-                UiEvent.ShowSnackbar(text)
-            }
-
-            is RulesUiEvent.RuleRemoved -> {
-                val text =
-                    UiText.StringResource(
-                        R.string.rule_removed_successfully,
-                        listOf(
-                            event.contactLabel,
-                            event.selectedRulesTab.title,
-                        ),
-                    )
-                UiEvent.ShowSnackbar(text)
-            }
-
-            is RulesUiEvent.OperationFailed -> {
-                val text = event.error.toUiText()
-                UiEvent.ShowSnackbar(text)
-            }
-        }
-
-        uiEventBus.sendEvent(uiEvent)
-
-    }
+// Moved to MainScreen
+//    ObserveAsEvent(
+//        flow = viewModel.events,
+//    ) { event ->
+//        val uiEvent = when (event) {
+//            is RulesUiEvent.RuleAdded -> {
+//                val text =
+//                    UiText.StringResource(
+//                        R.string.rule_added_successfully,
+//                        listOf(
+//                            event.number,
+//                            event.selectedRulesTab.title,
+//                        )
+//                    )
+//                UiEvent.ShowSnackbar(text)
+//            }
+//
+//            is RulesUiEvent.RuleRemoved -> {
+//                val text =
+//                    UiText.StringResource(
+//                        R.string.rule_removed_successfully,
+//                        listOf(
+//                            event.contactLabel,
+//                            event.selectedRulesTab.title,
+//                        ),
+//                    )
+//                UiEvent.ShowSnackbar(text)
+//            }
+//
+//            is RulesUiEvent.OperationFailed -> {
+//                val text = event.error.toUiText()
+//                UiEvent.ShowSnackbar(text)
+//            }
+//        }
+//
+//        uiEventBus.sendEvent(uiEvent)
+//
+//    }
 
     RulesScreenContent(
         rulesUiState = uiState,

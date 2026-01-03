@@ -90,17 +90,10 @@ fun AddNumberSheet(
 
     }
 
-//    val callLogLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.StartActivityForResult()
-//    ) {
-//        // TODO: Handle result from our custom call log screen
-//        onDismiss()
-//    }
-
     val readContactsPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        permissionRequest = null // Hide dialog
+        permissionRequest = null
         if (isGranted) {
             contactPickerLauncher.launch(
                 Intent(
@@ -218,7 +211,7 @@ fun AddNumberSheetContent(
             onClick = onAddFromContactsClick,
         )
         RuleActionItem(
-            icon = ImageVector.vectorResource(R.drawable.history_2_24dp),
+            icon = ImageVector.vectorResource(R.drawable.call_log_24dp),
             label = "Add from Recent Calls",
             onClick = onAddFromRecentsClick,
         )
@@ -253,7 +246,7 @@ private fun RuleActionItem(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null, // The label describes the action
+            contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
         )
 

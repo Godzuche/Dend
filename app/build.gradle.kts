@@ -128,4 +128,6 @@ dependencies {
 
     implementation("com.googlecode.libphonenumber:libphonenumber:9.0.21")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+
 }

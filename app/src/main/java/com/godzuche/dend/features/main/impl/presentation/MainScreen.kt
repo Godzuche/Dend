@@ -33,8 +33,10 @@ import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.core.presentation.UiEvent
+import com.godzuche.dend.core.presentation.UiText
 import com.godzuche.dend.core.presentation.messaging.UiEventBus
 import com.godzuche.dend.core.presentation.utils.ObserveAsEvent
+import com.godzuche.dend.core.presentation.utils.toUiText
 import com.godzuche.dend.features.activity.api.ActivityNavKey
 import com.godzuche.dend.features.activity.impl.navigation.activityEntry
 import com.godzuche.dend.features.firewall.api.FirewallNavKey
@@ -52,6 +54,8 @@ import com.godzuche.dend.features.rules.api.CallLogNavKey
 import com.godzuche.dend.features.rules.api.RulesNavKey
 import com.godzuche.dend.features.rules.impl.navigation.callLogEntry
 import com.godzuche.dend.features.rules.impl.navigation.rulesEntry
+import com.godzuche.dend.features.rules.impl.presentation.RulesUiEvent
+import com.godzuche.dend.features.rules.impl.presentation.RulesViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinActivityViewModel
 
@@ -59,6 +63,7 @@ import org.koin.compose.viewmodel.koinActivityViewModel
 fun MainScreen(
     modifier: Modifier = Modifier,
     dashboardViewModel: DashboardViewModel = koinActivityViewModel(),
+    rulesViewModel: RulesViewModel = koinActivityViewModel(),
     uiEventBus: UiEventBus = koinInject(),
 ) {
     val navigationState = rememberNavigationState(
@@ -110,6 +115,44 @@ fun MainScreen(
         animationSpec = tween(durationMillis = 500),
         label = "background_color_anim"
     )
+
+    ObserveAsEvent(
+        flow = rulesViewModel.events,
+    ) { event ->
+        val uiEvent = when (event) {
+            is RulesUiEvent.RuleAdded -> {
+                val text =
+                    UiText.StringResource(
+                        R.string.rule_added_successfully,
+                        listOf(
+                            event.number,
+                            event.selectedRulesTab.title,
+                        )
+                    )
+                UiEvent.ShowSnackbar(text)
+            }
+
+            is RulesUiEvent.RuleRemoved -> {
+                val text =
+                    UiText.StringResource(
+                        R.string.rule_removed_successfully,
+                        listOf(
+                            event.contactLabel,
+                            event.selectedRulesTab.title,
+                        ),
+                    )
+                UiEvent.ShowSnackbar(text)
+            }
+
+            is RulesUiEvent.OperationFailed -> {
+                val text = event.error.toUiText()
+                UiEvent.ShowSnackbar(text)
+            }
+        }
+
+        uiEventBus.sendEvent(uiEvent)
+
+    }
 
     ObserveAsEvent(
         flow = uiEventBus.events,

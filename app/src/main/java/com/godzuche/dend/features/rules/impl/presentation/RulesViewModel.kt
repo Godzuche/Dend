@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.godzuche.dend.core.data.PhoneCallDataSource
 import com.godzuche.dend.core.domain.utils.onError
 import com.godzuche.dend.core.domain.utils.onSuccess
-import com.godzuche.dend.core.presentation.messaging.UiEventBus
 import com.godzuche.dend.features.rules.impl.domain.model.Rule
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
@@ -26,7 +25,7 @@ import kotlinx.coroutines.launch
 class RulesViewModel(
     private val phoneCallDataSource: PhoneCallDataSource,
     private val rulesRepository: RulesRepository,
-    private val uiEventBus: UiEventBus,
+//    private val uiEventBus: UiEventBus,
 ) : ViewModel() {
 
     private val eventChannel = Channel<RulesUiEvent>()
@@ -100,23 +99,38 @@ class RulesViewModel(
     }
 
     fun addRule(number: String?, name: String?) {
-        viewModelScope.launch {
+//        viewModelScope.launch {
 //            if (number == null) {
 //                val message = UiText.DynamicString("Cannot add a private number")
 //                messenger.showMessage(message)
 //                return@launch
 //            }
 
+        addRule(
+            number = number,
+            name = name,
+            ruleType = uiState.value.selectedRulesTab,
+        )
+
+//    }
+    }
+
+    fun addRule(
+        number: String?,
+        name: String?,
+        ruleType: RuleType,
+    ) {
+        viewModelScope.launch {
             rulesRepository.addRule(
                 number = number ?: "",
                 name = name,
-                type = uiState.value.selectedRulesTab,
+                type = ruleType,
             )
                 .onSuccess {
                     eventChannel.send(
                         RulesUiEvent.RuleAdded(
                             name ?: number!!,
-                            uiState.value.selectedRulesTab,
+                            ruleType,
                         )
                     )
                 }
@@ -125,7 +139,6 @@ class RulesViewModel(
                         RulesUiEvent.OperationFailed(error)
                     )
                 }
-
         }
     }
 

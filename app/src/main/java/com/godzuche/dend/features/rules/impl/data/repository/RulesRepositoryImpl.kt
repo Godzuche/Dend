@@ -24,11 +24,15 @@ class RulesRepositoryImpl(
 
     override val blacklist: Flow<List<Rule>> =
         ruleDao.getRules(RuleType.BLACKLIST)
-            .map { it.map(RuleEntity::toDomainModel) }
+            .map { blacklist ->
+                blacklist.map(RuleEntity::toDomainModel)
+            }
 
     override val whitelist: Flow<List<Rule>> =
         ruleDao.getRules(RuleType.WHITELIST)
-            .map { it.map(RuleEntity::toDomainModel) }
+            .map { whitelist ->
+                whitelist.map(RuleEntity::toDomainModel)
+            }
 
     override suspend fun addRule(
         number: String,

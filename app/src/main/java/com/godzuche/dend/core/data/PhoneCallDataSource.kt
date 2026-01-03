@@ -114,7 +114,7 @@ class PhoneCallDataSource(
      * @param phoneNumber The phone number to search for.
      * @return The contact's display name if a match is found, otherwise null.
      */
-    @SuppressLint("MissingPermission") // Permissions should be checked by the calling code before invoking this.
+    @SuppressLint("MissingPermission")
     fun findContactName(phoneNumber: String?): String? {
         if (phoneNumber.isNullOrBlank()) {
             return null

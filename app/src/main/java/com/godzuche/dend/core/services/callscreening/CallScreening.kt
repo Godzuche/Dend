@@ -12,14 +12,17 @@ import android.telecom.Call
 import android.telecom.CallScreeningService
 import android.telecom.Connection
 import android.util.Log
+import com.godzuche.dend.core.data.PhoneCallDataSource
 import com.godzuche.dend.core.data.utils.PhoneNumberNormalizer
 import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.core.domain.repository.UserDataRepository
+import com.godzuche.dend.features.activity.impl.domain.repository.ActivityRepository
 import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.time.Clock
 
 fun Context.bindMyService() {
     Log.d("MainActivity", "binding my service")
@@ -46,7 +49,9 @@ fun Context.bindMyService() {
 class ScreeningService : CallScreeningService(), KoinComponent {
     val userDataRepository by inject<UserDataRepository>()
     val rulesRepository by inject<RulesRepository>()
+    val activityRepository by inject<ActivityRepository>()
     val phoneNumberNormalizer by inject<PhoneNumberNormalizer>()
+    val phoneCallDataSource by inject<PhoneCallDataSource>()
 
     override fun onScreenCall(callDetails: Call.Details) {
         val firewallState = runBlocking {
@@ -111,11 +116,15 @@ class ScreeningService : CallScreeningService(), KoinComponent {
                 blockCall(callDetails) // it is null for private numbers with hidden caller id
             } else {
                 val normalizationResult = phoneNumberNormalizer.normalize(incomingNumber)
+
                 normalizationResult.fold(
                     onSuccess = { normalizedNumber ->
+                        val contactName =
+                            phoneCallDataSource.findContactName(normalizedNumber)
+
                         Log.d(
                             "MyCallScreeningService",
-                            "Incoming Call normalized = $normalizedNumber"
+                            "Incoming Call normalized = $normalizedNumber name = $contactName"
                         )
                         // The incoming number was successfully parsed. Check against rules.
                         runBlocking {
@@ -125,6 +134,14 @@ class ScreeningService : CallScreeningService(), KoinComponent {
                                 FirewallState.ON -> {
                                     if (rulesRepository.isBlacklisted(normalizedNumber)) {
                                         Log.d("MyCallScreeningService", "blacklisted. blocking...")
+
+                                        activityRepository.logBlockActivity(
+                                            number = normalizedNumber,
+                                            name = contactName,
+                                            timestamp = Clock.System.now(),
+                                            firewallState = FirewallState.ON,
+                                        )
+
                                         blockCall(callDetails)
                                     } else {
                                         Log.d(
@@ -144,6 +161,14 @@ class ScreeningService : CallScreeningService(), KoinComponent {
                                             "MyCallScreeningService",
                                             "not whitelisted. blocking..."
                                         )
+
+                                        activityRepository.logBlockActivity(
+                                            number = normalizedNumber,
+                                            name = contactName,
+                                            timestamp = Clock.System.now(),
+                                            firewallState = FirewallState.ZEN,
+                                        )
+
                                         blockCall(callDetails)
                                     }
                                 }

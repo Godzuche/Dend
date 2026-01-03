@@ -5,6 +5,8 @@ import com.godzuche.dend.core.data.datastore.DenDPreferencesDataSource
 import com.godzuche.dend.core.data.repository.OfflineFirstUserDataRepository
 import com.godzuche.dend.core.data.utils.PhoneNumberNormalizer
 import com.godzuche.dend.core.domain.repository.UserDataRepository
+import com.godzuche.dend.features.activity.impl.data.repository.ActivityRepositoryImpl
+import com.godzuche.dend.features.activity.impl.domain.repository.ActivityRepository
 import com.godzuche.dend.features.rules.impl.data.repository.RulesRepositoryImpl
 import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -40,7 +42,6 @@ val dataModule = module {
 
     singleOf(::RulesRepositoryImpl).bind<RulesRepository>()
 
-    single {
-        PhoneNumberNormalizer(context = androidContext())
-    }
+    single { PhoneNumberNormalizer(context = androidContext()) }
+    singleOf(::ActivityRepositoryImpl).bind<ActivityRepository>()
 }
