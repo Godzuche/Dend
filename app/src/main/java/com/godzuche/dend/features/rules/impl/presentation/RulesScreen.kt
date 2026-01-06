@@ -76,7 +76,7 @@ fun RulesScreen(
     RulesScreenContent(
         rulesUiState = uiState,
         onSelectTab = viewModel::onSelectRulesTab,
-        onRemoveNumberClick = viewModel::/*onRemoveRule*/onRemoveItem,
+        onRemoveNumberClick = viewModel::onRemoveItem,
         onDismissAddManuallyDialog = {
             viewModel.setShowAddManuallyDialogState(false)
         },

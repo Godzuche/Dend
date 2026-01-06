@@ -12,7 +12,6 @@ import com.godzuche.dend.features.rules.impl.presentation.state.CallLogUiState
 import com.godzuche.dend.features.rules.impl.presentation.state.RulesState
 import com.godzuche.dend.features.rules.impl.presentation.state.RulesUiState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,36 +25,25 @@ import kotlinx.coroutines.launch
 class RulesViewModel(
     private val phoneCallDataSource: PhoneCallDataSource,
     private val rulesRepository: RulesRepository,
-//    private val uiEventBus: UiEventBus,
 ) : ViewModel() {
 
     private val eventChannel = Channel<RulesUiEvent>()
     val events = eventChannel.receiveAsFlow()
 
     private var itemToDelete: MutableStateFlow<Rule?> = MutableStateFlow(null)
-//    private var deleteJob: Job? = null
 
     private val _uiState = MutableStateFlow(RulesUiState())
     val uiState = combine(
         _uiState,
         rulesRepository.blacklist,
         rulesRepository.whitelist,
-//        itemToDelete,
-    ) { state, blacklist, whitelist/*, deletedItem*/ ->
+    ) { state, blacklist, whitelist ->
         state.copy(
             blacklistState = RulesState.Success(
-                rules = /*if (deletedItem?.type == RuleType.BLACKLIST) {
-                    blacklist.filter { rule ->
-                        rule.number != deletedItem.number
-                    }
-                } else */blacklist,
+                rules = blacklist,
             ),
             whitelistState = RulesState.Success(
-                rules = /*if (deletedItem?.type == RuleType.WHITELIST) {
-                    whitelist.filter { rule ->
-                        rule.number != deletedItem.number
-                    }
-                } else */whitelist,
+                rules = whitelist,
             ),
         )
     }.stateIn(
@@ -84,7 +72,7 @@ class RulesViewModel(
         }
     }
 
-    fun onRemoveRule(ruleItem: Rule) {
+    private fun onRemoveRule(ruleItem: Rule) {
 //        viewModelScope.launch {
 //            rulesRepository.removeRule(ruleItem)
 //                .onSuccess {
@@ -102,17 +90,12 @@ class RulesViewModel(
 //                }
 //        }
 
-        /*deleteJob = */viewModelScope.launch {
-//            rulesRepository.removeRule(ruleItem)
-//                .onError { error ->
-//                    eventChannel.send(
-//                        RulesUiEvent.OperationFailed(error)
-//                    )
-//                }
-
+        viewModelScope.launch {
             rulesRepository.commitDeletion(ruleItem)
                 .onError { error ->
-                    //
+                    eventChannel.send(
+                        RulesUiEvent.OperationFailed(error)
+                    )
                 }
 
             itemToDelete.value = null // Clear after successful deletion
@@ -128,20 +111,11 @@ class RulesViewModel(
     }
 
     fun addRule(number: String?, name: String?) {
-//        viewModelScope.launch {
-//            if (number == null) {
-//                val message = UiText.DynamicString("Cannot add a private number")
-//                messenger.showMessage(message)
-//                return@launch
-//            }
-
         addRule(
             number = number,
             name = name,
             ruleType = uiState.value.selectedRulesTab,
         )
-
-//    }
     }
 
     fun addRule(
@@ -177,57 +151,11 @@ class RulesViewModel(
      * Removes the item from the UI state and starts the "undo" window.
      */
     fun onRemoveItem(item: Rule) {
-        // Cancel any pending delete operation
-//        deleteJob?.cancel()
-
-        // Hold the item in a temporary variable
         itemToDelete.value = item
 
-        // Optimistically update the UI by removing the item from the list
-//        _uiState.update { currentState ->
-//            when (item.type) {
-//                RuleType.BLACKLIST -> {
-//                    val rules = currentState.blacklistState.rules.filter {
-//                        it.number != item.number
-//                    }
-//                    currentState.copy(
-//                        blacklistState = RulesState.Success(rules)
-//                    )
-//                }
-//
-//                RuleType.WHITELIST -> {
-//                    val rules = currentState.whitelistState.rules.filter {
-//                        it.number != item.number
-//                    }
-//                    currentState.copy(
-//                        whitelistState = RulesState.Success(rules)
-//                    )
-//                }
-//            }
-//        }
-
-        // Send the snackbar event with the Undo action
         viewModelScope.launch {
-//            val text =
-//                UiText.StringResource(R.string.rule_removed_successfully, listOf(item.number))
-//            messenger.sendEvent(UiEvent.ShowSnackbar(text, actionLabelResId = R.string.undo_action))
-
-            // This marks `isPendingDeletion = true` in the DB. The UI updates automatically
-            // because the main getRules()  flow filters these out.
             rulesRepository.markItemForDeletion(item)
                 .onSuccess {
-                    // Send the snackbar event with the Undo action.
-//                    val text = UiText.StringResource(
-//                        R.string.rule_removed_successfully,
-//                        listOf(item.number)
-//                    )
-//                    messenger.sendEvent(
-//                        UiEvent.ShowSnackbar(
-//                            text,
-//                            actionLabelResId = R.string.undo_action
-//                        )
-//                    )
-
                     eventChannel.send(
                         RulesUiEvent.RuleRemoved(
                             item.run { name ?: number },
@@ -236,20 +164,11 @@ class RulesViewModel(
                     )
                 }
                 .onError { error ->
-                    // If marking fails, show an error and clear the temp item.
-//                    eventChannel.send(UiEvent.ShowSnackbar((error as DataError).toUiText()))
                     eventChannel.send(
                         RulesUiEvent.OperationFailed(error)
                     )
                     itemToDelete.value = null
                 }
-
-//            eventChannel.send(
-//                RulesUiEvent.RuleRemoved(
-//                    item.run { name ?: number },
-//                    uiState.value.selectedRulesTab,
-//                )
-//            )
         }
     }
 
@@ -257,33 +176,10 @@ class RulesViewModel(
      * Called by the UI if the user taps the "Undo" action.
      */
     fun onUndoRemove() {
-        // Cancel the pending delete job
-//        deleteJob?.cancel()
-
-//        itemToDelete.value?.let { item ->
-//            // Re-add the item to the UI state. The database was never touched.
-//            _uiState.update { currentState ->
-//                when (item.type) {
-//                    RuleType.BLACKLIST -> {
-//                        val rules =
-//                            (currentState.blacklistState.rules + item).sortedByDescending { it.createdAt }
-//                        currentState.copy(blacklistState = RulesState.Success(rules))
-//                    }
-//
-//                    RuleType.WHITELIST -> {
-//                        val rules =
-//                            (currentState.whitelistState.rules + item).sortedByDescending { it.createdAt }
-//                        currentState.copy(whitelistState = RulesState.Success(rules))
-//                    }
-//                }
-//            }
-//        }
-
         itemToDelete.value?.let { item ->
             viewModelScope.launch {
                 rulesRepository.unmarkItemForDeletion(item)
                     .onError { error ->
-//                        messenger.sendEvent(UiEvent.ShowSnackbar((error as DataError).toUiText()))
                         eventChannel.send(
                             RulesUiEvent.OperationFailed(error)
                         )
@@ -300,14 +196,6 @@ class RulesViewModel(
      * This permanently deletes the item from the database.
      */
     fun onCommitRemove() {
-        // This is where we actually delete from the database
-//        itemToDelete?.let { item ->
-//            deleteJob = viewModelScope.launch {
-//                rulesRepository.removeRule(item)
-//                itemToDelete = null // Clear after successful deletion
-//            }
-//        }
-
         itemToDelete.value?.let {
             onRemoveRule(it)
         }

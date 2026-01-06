@@ -47,7 +47,6 @@ class RulesRepositoryImpl(
             }
 
     override suspend fun markItemForDeletion(item: Rule): Result<Unit, DataError.Local> {
-//        ruleDao.markForDeletion(item.number)
         return try {
             ruleDao.markForDeletion(item.number)
             Result.Success(Unit)
@@ -57,7 +56,6 @@ class RulesRepositoryImpl(
     }
 
     override suspend fun unmarkItemForDeletion(item: Rule): Result<Unit, DataError.Local> {
-//        ruleDao.unmarkForDeletion(item.number)
         return try {
             ruleDao.unmarkForDeletion(item.number)
             Result.Success(Unit)
@@ -67,7 +65,6 @@ class RulesRepositoryImpl(
     }
 
     override suspend fun commitDeletion(item: Rule): Result<Unit, DataError.Local> {
-//        ruleDao.deletePending()
         return try {
             ruleDao.deletePending()
             Result.Success(Unit)

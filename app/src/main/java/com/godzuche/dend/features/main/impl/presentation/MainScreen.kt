@@ -184,8 +184,8 @@ fun MainScreen(
 
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
-                        // User tapped "Undo". Send the corresponding event back.
                         when (event.snackbarAction) {
+                            // User tapped "Undo". Send the corresponding event back.
                             is ShowSnackbarAction.UndoRemoveRule -> {
                                 if (event.snackbarAction.action == SnackbarAction.UNDO) {
                                     // A better way would be to have a specific event for this.
