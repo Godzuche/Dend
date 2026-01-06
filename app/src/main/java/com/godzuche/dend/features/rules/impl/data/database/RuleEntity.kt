@@ -1,5 +1,6 @@
 package com.godzuche.dend.features.rules.impl.data.database
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -26,5 +27,8 @@ data class RuleEntity(
     val number: String,
     val name: String?,
     val type: RuleType,
+    @ColumnInfo("created_at")
     val createdAt: Instant = Clock.System.now(),
+    @ColumnInfo("is_pending_deletion")
+    val isPendingDeletion: Boolean = false,
 )

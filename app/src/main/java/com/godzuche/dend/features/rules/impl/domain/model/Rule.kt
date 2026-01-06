@@ -8,6 +8,7 @@ data class Rule(
     val name: String?,
     val type: RuleType,
     val createdAt: Instant,
+    val isPendingDeletion: Boolean,
 ) {
     val displayName get() = name ?: number
     val displayNameWithNumber

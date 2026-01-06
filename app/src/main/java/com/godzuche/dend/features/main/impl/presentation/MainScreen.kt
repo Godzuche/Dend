@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -32,6 +33,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.core.domain.model.FirewallState
+import com.godzuche.dend.core.presentation.ShowSnackbarAction
+import com.godzuche.dend.core.presentation.SnackbarAction
 import com.godzuche.dend.core.presentation.UiEvent
 import com.godzuche.dend.core.presentation.UiText
 import com.godzuche.dend.core.presentation.messaging.UiEventBus
@@ -141,7 +144,13 @@ fun MainScreen(
                             event.selectedRulesTab.title,
                         ),
                     )
-                UiEvent.ShowSnackbar(text)
+
+                UiEvent.ShowSnackbar(
+                    message = text,
+                    snackbarAction = ShowSnackbarAction.UndoRemoveRule(
+                        undoAction = SnackbarAction.UNDO,
+                    ),
+                )
             }
 
             is RulesUiEvent.OperationFailed -> {
@@ -163,10 +172,45 @@ fun MainScreen(
         when (event) {
             is UiEvent.ShowSnackbar -> {
                 val message = event.message.asString(context)
-                snackbarHostState.showSnackbar(
+                val actionLabel = event.snackbarAction?.action?.label
+
+                val result = snackbarHostState.showSnackbar(
                     message = message,
-                    duration = SnackbarDuration.Short,
+                    actionLabel = actionLabel,
+                    duration = if (actionLabel == null) {
+                        SnackbarDuration.Short
+                    } else SnackbarDuration.Long,
                 )
+
+                when (result) {
+                    SnackbarResult.ActionPerformed -> {
+                        // User tapped "Undo". Send the corresponding event back.
+                        when (event.snackbarAction) {
+                            is ShowSnackbarAction.UndoRemoveRule -> {
+                                if (event.snackbarAction.action == SnackbarAction.UNDO) {
+                                    // A better way would be to have a specific event for this.
+                                    // For now, let's call the ViewModel directly.
+                                    rulesViewModel.onUndoRemove()
+                                }
+                            }
+
+                            else -> Unit
+                        }
+                    }
+
+                    SnackbarResult.Dismissed -> {
+                        // Snackbar timed out or was dismissed
+                        when (event.snackbarAction) {
+                            is ShowSnackbarAction.UndoRemoveRule -> {
+                                if (event.snackbarAction.action == SnackbarAction.UNDO) {
+                                    rulesViewModel.onCommitRemove()
+                                }
+                            }
+
+                            else -> Unit
+                        }
+                    }
+                }
             }
         }
     }

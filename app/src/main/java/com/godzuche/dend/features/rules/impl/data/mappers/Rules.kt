@@ -9,6 +9,7 @@ fun RuleEntity.toDomainModel() = Rule(
     name = name,
     type = type,
     createdAt = createdAt,
+    isPendingDeletion = isPendingDeletion,
 )
 
 fun Rule.toEntity() = RuleEntity(

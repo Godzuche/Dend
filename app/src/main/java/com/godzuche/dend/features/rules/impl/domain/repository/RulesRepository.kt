@@ -42,4 +42,10 @@ interface RulesRepository {
      * @return True if the number is on the whitelist, false otherwise.
      */
     suspend fun isWhitelisted(number: String?): Boolean
+
+    suspend fun markItemForDeletion(item: Rule): Result<Unit, DataError.Local>
+
+    suspend fun unmarkItemForDeletion(item: Rule): Result<Unit, DataError.Local>
+
+    suspend fun commitDeletion(item: Rule): Result<Unit, DataError.Local>
 }

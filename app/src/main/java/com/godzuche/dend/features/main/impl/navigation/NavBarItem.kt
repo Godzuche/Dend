@@ -7,7 +7,7 @@ import com.godzuche.dend.features.firewall.api.FirewallNavKey
 import com.godzuche.dend.features.rules.api.RulesNavKey
 
 data class NavBarItem(
-    @DrawableRes
+    @param: DrawableRes
     val iconRes: Int,
     val title: String,
 )

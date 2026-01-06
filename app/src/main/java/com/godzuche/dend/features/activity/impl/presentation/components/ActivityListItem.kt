@@ -1,6 +1,8 @@
 package com.godzuche.dend.features.activity.impl.presentation.components
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +28,6 @@ import com.godzuche.dend.R
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.core.presentation.utils.toFriendlyStringTimeOnly
-import com.godzuche.dend.features.activity.impl.presentation.ActionRow
 import com.godzuche.dend.features.activity.impl.presentation.BlockedCallItemUiState
 import kotlin.time.Clock
 
@@ -169,11 +170,14 @@ fun ActivityListItem2(
             .fillMaxWidth()
             .clickable(onClick = onItemClick)
             .padding(vertical = 8.dp)
-            .animateContentSize(),
+            .animateContentSize(
+                animationSpec = spring(
+                    stiffness = Spring.StiffnessMedium,
+                )
+            ),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             val modeIcon = when (item.blockedInMode) {
                 FirewallState.ON -> ImageVector.vectorResource(R.drawable.shield_24dp)

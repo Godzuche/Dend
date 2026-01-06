@@ -2,49 +2,31 @@ package com.godzuche.dend.features.activity.impl.presentation
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.provider.ContactsContract
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.godzuche.dend.R
 import com.godzuche.dend.core.data.utils.PhoneNumberNormalizer
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.features.activity.impl.presentation.components.ActivityListItem2
+import com.godzuche.dend.features.activity.impl.presentation.components.DateHeader
 import com.godzuche.dend.features.activity.impl.presentation.components.EmptyActivityState
 import com.godzuche.dend.features.rules.impl.domain.model.RuleType
 import com.godzuche.dend.features.rules.impl.presentation.RulesViewModel
@@ -76,7 +58,7 @@ fun ActivityScreen(
 
     fun onCallNumber(number: String) {
         val intent = Intent(Intent.ACTION_DIAL).apply {
-            data = Uri.parse("tel:$number")
+            data = "tel:$number".toUri()
         }
         context.startActivity(intent)
         onActionCompleted()
@@ -119,49 +101,57 @@ fun ActivityScreenContent(
     onAddContact: (String) -> Unit,
 ) {
 
-    if (uiState.blockedCallsUiState.activityLog.isEmpty()) {
-        EmptyActivityState()
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 8.dp)
-        ) {
-            uiState.blockedCallsUiState.activityTimeline.forEach { timelineItem ->
-                when (timelineItem) {
-                    is TimelineItem.DateHeader -> {
-                        stickyHeader(
-                            key = timelineItem.key,
-                            contentType = { "header" },
-                        ) {
-                            DateHeader(text = timelineItem.dateString)
-                        }
-                    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        when (uiState.blockedCallsUiState) {
+            is BlockedCallsState.Loading -> CircularProgressIndicator()
 
-                    is TimelineItem.LogEntry -> {
-                        item(
-                            key = timelineItem.key,
-                            contentType = "log_item",
-                        ) {
-                            Column(
-                                modifier = Modifier.animateItem()
-                            ) {
-//                                ActivityListItem(
-//                                    item = timelineItem.item,
-//                                    onAllowClick = {
-//                                        onAllowClick(timelineItem.item)
-//                                    }
-//                                )
+            is BlockedCallsState.Success -> {
+                if (uiState.blockedCallsUiState.activityLog.isEmpty()) {
+                    EmptyActivityState()
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 8.dp)
+                    ) {
+                        uiState.blockedCallsUiState.activityTimeline.forEach { timelineItem ->
+                            when (timelineItem) {
+                                is TimelineItem.DateHeader -> {
+                                    stickyHeader(
+                                        key = timelineItem.key,
+                                        contentType = { "header" },
+                                    ) {
+                                        DateHeader(text = timelineItem.dateString)
+                                    }
+                                }
 
-                                ActivityListItem2(
-                                    item = timelineItem.item,
-                                    isExpanded = timelineItem.key == expandedItemKey,
-                                    onItemClick = { onItemClicked(timelineItem.key) },
-                                    onAllowClick = { onAllowClick(timelineItem.item) },
-                                    onCallClick = { onCallNumber(timelineItem.item.number) },
-                                    onAddContactClick = { onAddContact(timelineItem.item.number) }
-                                )
+                                is TimelineItem.LogEntry -> {
+                                    item(
+                                        key = timelineItem.key,
+                                        contentType = "log_item",
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.animateItem()
+                                        ) {
+                                            ActivityListItem2(
+                                                item = timelineItem.item,
+                                                isExpanded = timelineItem.key == expandedItemKey,
+                                                onItemClick = { onItemClicked(timelineItem.key) },
+                                                onAllowClick = { onAllowClick(timelineItem.item) },
+                                                onCallClick = { onCallNumber(timelineItem.item.number) },
+                                                onAddContactClick = { onAddContact(timelineItem.item.number) }
+                                            )
 
-                                HorizontalDivider(modifier = Modifier.padding(start = 16.dp))
+                                            HorizontalDivider(
+                                                modifier = Modifier.padding(start = 40.dp) // Leading icon spacing
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -171,115 +161,6 @@ fun ActivityScreenContent(
     }
 }
 
-/**
- * The row of quick action chips. Uses standard AssistChip.
- */
-@Composable
-fun ActionRow(
-    blockedCallItemUiState: BlockedCallItemUiState,
-    onAllowClick: () -> Unit,
-    onCallClick: () -> Unit,
-    onAddContactClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp, start = 56.dp, end = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        if (!blockedCallItemUiState.isWhitelisted) {
-            QuickActionChip(
-                text = "Allow",
-                icon = ImageVector.vectorResource(R.drawable.verified_user_24dp),
-                onClick = onAllowClick,
-            )
-        }
-
-//        QuickActionChip(
-//            text = "Call Back",
-//            icon = ImageVector.vectorResource(R.drawable.call_24dp),
-//            onClick = onCallClick,
-//        )
-//
-//        if (!blockedCallItemUiState.isInDeviceContacts) {
-//            QuickActionChip(
-//                text = "Add Contact",
-//                icon = ImageVector.vectorResource(R.drawable.person_add_24dp),
-//                onClick = onAddContactClick,
-//            )
-//        }
-
-        Spacer(
-            modifier = Modifier.weight(1f)
-        )
-
-        Row(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceContainerHighest
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onCallClick) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.call_24dp),
-                    contentDescription = "Call Back",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            if (!blockedCallItemUiState.isInDeviceContacts) {
-                VerticalDivider(
-                    modifier = Modifier
-                        .height(24.dp)
-                        .width(1.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                )
-                IconButton(onClick = onAddContactClick) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.person_add_24dp),
-                        contentDescription = "Add to Contacts",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun QuickActionChip(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    AssistChip(
-        onClick = onClick,
-        label = { Text(text /*style = MaterialTheme.typography.labelMedium*/) },
-        leadingIcon = {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                modifier = Modifier.size(AssistChipDefaults.IconSize)
-            )
-        }
-    )
-}
-
-@Composable
-private fun DateHeader(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelSmall,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    )
-}
 
 @Preview(showBackground = true, device = "id:pixel_6")
 @Composable
@@ -307,11 +188,6 @@ internal fun ActivityScreenPreview() = DendTheme {
         onCallNumber = {},
         onAddContact = {},
     )
-
-//    ActivityScreenContent2(
-//        timelineItems = getActivityUiStatePreviewData(context),
-////        onAllowClick = {},
-//    )
 }
 
 private fun getActivityUiStatePreviewData(context: Context): ActivityUiState {

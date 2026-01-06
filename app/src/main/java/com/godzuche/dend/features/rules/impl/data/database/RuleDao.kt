@@ -26,8 +26,26 @@ interface RuleDao {
     /**
      * Retrieves all rules of a specific type (e.g., all blacklist items) as a Flow.
      */
-    @Query("SELECT * FROM rules WHERE type = :ruleType ORDER BY createdAt DESC")
+    @Query("SELECT * FROM rules WHERE type = :ruleType AND is_pending_deletion = 0 ORDER BY created_at DESC")
     fun getRules(ruleType: RuleType): Flow<List<RuleEntity>>
+
+    /**
+     * Updates an item to mark it for pending deletion.
+     */
+    @Query("UPDATE rules SET is_pending_deletion = 1 WHERE number = :number")
+    suspend fun markForDeletion(number: String)
+
+    /**
+     * Reverses a pending deletion by un-marking the flag.
+     */
+    @Query("UPDATE rules SET is_pending_deletion = 0 WHERE number = :number")
+    suspend fun unmarkForDeletion(number: String)
+
+    /**
+     * Finds and permanently deletes all rules that are marked for deletion.
+     */
+    @Query("DELETE FROM rules WHERE is_pending_deletion = 1")
+    suspend fun deletePending()
 
     @Query("SELECT COUNT(*) > 0 FROM rules WHERE number = :number AND type = 'BLACKLIST'")
     suspend fun isNumberInBlacklist(number: String): Boolean

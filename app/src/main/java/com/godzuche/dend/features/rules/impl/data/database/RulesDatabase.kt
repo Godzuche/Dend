@@ -6,9 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.godzuche.dend.core.data.database.InstantConverter
+import com.godzuche.dend.features.rules.impl.data.database.migrations.MIGRATION_1_2
 
 @TypeConverters(InstantConverter::class)
-@Database(entities = [RuleEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [RuleEntity::class],
+    version = 1,
+    exportSchema = true,
+)
 abstract class RulesDatabase : RoomDatabase() {
 
     abstract fun ruleDao(): RuleDao
@@ -24,7 +29,9 @@ abstract class RulesDatabase : RoomDatabase() {
                     context.applicationContext,
                     RulesDatabase::class.java,
                     "dend_rules_database"
-                ).build()
+                )
+//                    .addMigrations(MIGRATION_1_2)
+                    .build()
                 INSTANCE = instance
                 instance
             }
