@@ -179,7 +179,7 @@ fun MainScreen(
                     actionLabel = actionLabel,
                     duration = if (actionLabel == null) {
                         SnackbarDuration.Short
-                    } else SnackbarDuration.Long,
+                    } else SnackbarDuration.Short,
                 )
 
                 when (result) {
