@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
 //    alias(libs.plugins.protobuf)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -42,6 +43,15 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
@@ -84,6 +94,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -123,11 +134,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
-    testImplementation(libs.androidx.room.testing)
+//    testImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.room.testing)
     implementation(libs.androidx.room.paging)
 
-    implementation("com.googlecode.libphonenumber:libphonenumber:9.0.21")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+    implementation(libs.googlecode.libphonenumber)
+    implementation(libs.kotlinx.datetime)
 
 }
