@@ -17,7 +17,7 @@ internal fun QuickActionChip(
 ) {
     AssistChip(
         onClick = onClick,
-        label = { Text(text /*style = MaterialTheme.typography.labelMedium*/) },
+        label = { Text(text) },
         leadingIcon = {
             Icon(
                 imageVector = icon,

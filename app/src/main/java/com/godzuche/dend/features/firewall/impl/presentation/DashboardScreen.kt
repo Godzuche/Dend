@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.godzuche.dend.core.designsystem.theme.DendTheme
 import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.core.domain.model.next
+import com.godzuche.dend.features.activity.impl.data.repository.DashboardStats
 import com.godzuche.dend.features.firewall.impl.presentation.components.StatCard
 import com.godzuche.dend.features.firewall.impl.presentation.components.StatusToggleButton
 import org.koin.compose.viewmodel.koinActivityViewModel
@@ -40,10 +41,10 @@ fun DashboardScreen(
 //    onNavigateToRules: () -> Unit,
     dashboardViewModel: DashboardViewModel = koinActivityViewModel(),
 ) {
-    val firewallUiState by dashboardViewModel.firewallUiState.collectAsStateWithLifecycle()
+    val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
     DashboardScreenContent(
-        firewallUiState = firewallUiState,
+        uiState = uiState,
         onToggleStatus = dashboardViewModel::toggleFirewallState,
         onActivityStatClick = onNavigateToActivity,
 //        onRulesStatClick = onNavigateToRules,
@@ -53,15 +54,15 @@ fun DashboardScreen(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DashboardScreenContent(
-    firewallUiState: FirewallUiState,
+    uiState: DashboardUiState,
     onToggleStatus: () -> Unit,
     onActivityStatClick: () -> Unit,
 //    onRulesStatClick: () -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
 
-    when (firewallUiState) {
-        is FirewallUiState.Loading -> {
+    when (uiState.isLoading) {
+        true -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
@@ -70,8 +71,8 @@ fun DashboardScreenContent(
             }
         }
 
-        is FirewallUiState.Success -> {
-            val firewallState = firewallUiState.firewallState
+        else -> {
+            val firewallState = uiState.firewallUiState.firewallState
             val statsAlpha by animateFloatAsState(
                 targetValue = if (firewallState != FirewallState.OFF) 1f else 0f,
                 animationSpec = tween(durationMillis = 300),
@@ -144,7 +145,7 @@ fun DashboardScreenContent(
                     StatCard(
                         modifier = Modifier.weight(1f),
                         label = "Calls Blocked Today",
-                        value = "17",
+                        value = uiState.statsUiState.stats.callsBlockedToday,
                         onClick = onActivityStatClick,
                     )
 
@@ -158,11 +159,18 @@ fun DashboardScreenContent(
                     StatCard(
                         modifier = Modifier.weight(1f),
                         label = "Blocked in Total",
-                        value = "241",
+                        value = uiState.statsUiState.stats.totalBlocked,
                         onClick = onActivityStatClick,
                     )
                 }
 //        }
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "Last Blocked: ${uiState.statsUiState.stats.lastBlockedCallTime ?: "No recent activity"}",
+                    style = MaterialTheme.typography.labelMedium,
+                )
 
                 Spacer(Modifier.height(24.dp))
             }
@@ -175,7 +183,7 @@ fun DashboardScreenContent(
 @Composable
 private fun DashboardScreenOffPreview() = DendTheme {
     DashboardScreenContent(
-        firewallUiState = FirewallUiState.Success(FirewallState.OFF),
+        uiState = DashboardUiState(),
         onToggleStatus = {},
         onActivityStatClick = {},
 //        onRulesStatClick = {},
@@ -186,7 +194,11 @@ private fun DashboardScreenOffPreview() = DendTheme {
 @Composable
 private fun DashboardScreenOnPreview() = DendTheme {
     DashboardScreenContent(
-        firewallUiState = FirewallUiState.Success(FirewallState.ON),
+        uiState = DashboardUiState()
+            .copy(
+                firewallUiState = FirewallUiState.Success(FirewallState.ON),
+                statsUiState = StatsUiState.Success(DashboardStats().toUiState()),
+            ),
         onToggleStatus = {},
         onActivityStatClick = {},
 //        onRulesStatClick = {},
@@ -197,7 +209,11 @@ private fun DashboardScreenOnPreview() = DendTheme {
 @Composable
 private fun DashboardScreenZenPreview() = DendTheme {
     DashboardScreenContent(
-        firewallUiState = FirewallUiState.Success(FirewallState.ZEN),
+        uiState = DashboardUiState()
+            .copy(
+                firewallUiState = FirewallUiState.Success(FirewallState.ZEN),
+                statsUiState = StatsUiState.Success(DashboardStats().toUiState()),
+            ),
         onToggleStatus = {},
         onActivityStatClick = {},
 //        onRulesStatClick = {},

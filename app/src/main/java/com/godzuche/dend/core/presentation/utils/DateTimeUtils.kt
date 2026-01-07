@@ -3,11 +3,18 @@ package com.godzuche.dend.core.presentation.utils
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
+
+fun getStartOfToday(): Instant {
+    val now = Clock.System.now()
+    val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return today.atStartOfDayIn(TimeZone.currentSystemDefault())
+}
 
 fun Instant.toFriendlyStringTimeOnly(): String {
     val now = Clock.System.now()

@@ -74,7 +74,6 @@ internal fun ActivityListItem(
 
             Text(
                 text = "Blocked • ${item.timestamp.toFriendlyStringTimeOnly()}",
-//                style = MaterialTheme.typography.bodyMedium,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

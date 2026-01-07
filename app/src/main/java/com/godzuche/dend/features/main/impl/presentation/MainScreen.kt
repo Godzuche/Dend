@@ -107,10 +107,10 @@ fun MainScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val firewallUiState by dashboardViewModel.firewallUiState.collectAsStateWithLifecycle()
+    val dashboardUiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
     val animatedBackgroundColor by animateColorAsState(
-        targetValue = if (firewallUiState.firewallState == FirewallState.ZEN) {
+        targetValue = if (dashboardUiState.firewallUiState.firewallState == FirewallState.ZEN) {
             MaterialTheme.colorScheme.surfaceContainerLow
         } else {
             MaterialTheme.colorScheme.background
