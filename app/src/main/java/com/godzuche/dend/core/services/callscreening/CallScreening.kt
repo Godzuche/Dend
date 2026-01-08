@@ -23,11 +23,7 @@ import com.godzuche.dend.core.domain.model.FirewallState
 import com.godzuche.dend.core.domain.repository.UserDataRepository
 import com.godzuche.dend.features.activity.impl.domain.repository.ActivityRepository
 import com.godzuche.dend.features.rules.impl.domain.repository.RulesRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -66,21 +62,6 @@ class ScreeningService : CallScreeningService(), KoinComponent {
 
     private val NOTIFICATION_CHANNEL_ID = "ScreeningServiceChannel"
     private val NOTIFICATION_ID = 1337
-
-//    private val appContext: Context by inject()
-//    private var serviceScope: CoroutineScope? = null
-
-//    override fun onBind(intent: Intent?): IBinder? {
-//        Log.d("ScreeningService", "Service bound.")
-//        serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-//        return super.onBind(intent)
-//    }
-//
-//    override fun onUnbind(intent: Intent?): Boolean {
-//        Log.d("ScreeningService", "Service unbound.")
-//        serviceScope?.cancel() // Cancel the scope to clean up any running coroutines
-//        return false
-//    }
 
     override fun onScreenCall(callDetails: Call.Details) {
         startForeground(NOTIFICATION_ID, createNotification())
@@ -264,7 +245,7 @@ class ScreeningService : CallScreeningService(), KoinComponent {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
                 "Call Screening",
-                NotificationManager.IMPORTANCE_LOW // Low importance is key!
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Active when screening an incoming call."
                 enableLights(false)
