@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+//    alias(libs.plugins.protobuf)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -40,7 +44,43 @@ android {
     buildFeatures {
         compose = true
     }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
+
+// Setup protobuf configuration, generating lite Java and Kotlin classes
+//protobuf {
+//    protoc {
+//        artifact = libs.protobuf.protoc.get().toString()
+//    }
+//    generateProtoTasks {
+//        all().forEach { task ->
+//            task.builtins {
+//                register("java") {
+//                    option("lite")
+//                }
+//                register("kotlin") {
+//                    option("lite")
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//androidComponents.beforeVariants {
+//    android.sourceSets.register(it.name) {
+//        val buildDir = layout.buildDirectory.get().asFile
+//        java.srcDir(buildDir.resolve("generated/source/proto/${it.name}/java"))
+//        kotlin.srcDir(buildDir.resolve("generated/source/proto/${it.name}/kotlin"))
+//    }
+//}
 
 dependencies {
     implementation(libs.androidx.core.ktx)
@@ -51,6 +91,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,4 +102,43 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    //
+    implementation(libs.lottie.compose)
+    // Nav3
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.material3.adaptive.navigation3)
+//    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.kotlinx.collections)
+
+    implementation(libs.androidx.core.splashscreen)
+
+    // Datastore
+    api(libs.androidx.dataStore)
+    // Proto
+//    api(libs.protobuf.kotlin.lite)
+
+    // Koin
+    implementation(platform(libs.koin.bom))
+//    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.compose.navigation)
+//    implementation("io.insert-koin:koin-compose-navigation3") // Experimental
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+//    testImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.room.testing)
+    implementation(libs.androidx.room.paging)
+
+    implementation(libs.googlecode.libphonenumber)
+    implementation(libs.kotlinx.datetime)
+
 }
