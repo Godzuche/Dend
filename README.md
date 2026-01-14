@@ -1,63 +1,81 @@
-# DenD – Block Calls, Not Connections.
+# Dend – An Intelligent Call Firewall for Android
 
-[//]: # (Todo: Add Feature - Set Automatic Routines for different firewall modes)
-Ever been in the middle of a game, a meeting, or focused work, only to have an unwanted call not only interrupt you but also kill your phone's internet connection?
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/20674409/236163351-2e4a6e38-8c08-4b2a-8991-53b9b47e2469.png" alt="Dend App Logo" width="150"/>
+</p>
 
-That exact frustration is why DenD was built. It's a lightweight, open-source Android app that acts as a personal firewall for your calls, giving you back your focus and your data connection. It allows you to create simple but powerful rules to ensure that only the people you want to hear from can make your phone ring.
+<p align="center">
+  <strong>Block Calls, Not Connections.</strong>
+  <br />
+  A modern, open-source Android app that gives you back your focus by intelligently filtering incoming calls based on your rules.
+</p>
 
-## Features
+<p align="center">
+  <a href="https://github.com/Godzuche/Dend/releases">
+    <img src="https://img.shields.io/github/v/release/Godzuche/Dend?style=for-the-badge" alt="Latest Release"/>
+  </a>
+  <img src="https://img.shields.io/github/license/Godzuche/Dend?style=for-the-badge" alt="License"/>
+</p>
 
-- **Zen Mode:**
-  With a single tap, block all incoming calls that aren't on your whitelist. Perfect for gaming sessions, meetings, or focused work.
+## The Problem
+Ever been in a focused work session, an important meeting, or a critical moment in a game, only to have an unwanted call interrupt you? Worse, on many networks, that incoming call can momentarily kill your phone's mobile data connection, disrupting your flow entirely.
 
-- **Personal Blacklist:**
-  Build your own list of numbers to block. They will be rejected instantly and silently, without ever disturbing you.
+Dend was engineered as a robust solution to this exact problem. It's a lightweight, private, and powerful firewall for your calls, ensuring that only the people you trust can make your phone ring.
 
-- **VIP Whitelist:**
-  Create a list of approved "VIP" numbers (family, friends, work). These calls will always get through, no matter what.
+## Features Implemented
+This project showcases a production-ready application built with modern, best-practice Android architecture.
 
-- **Invisible Blocking:**
-  Rejected calls never ring, never show a "missed call" notification, and don't clutter your phone's native call history.
+- **Three-Mode Firewall:**
+    - **Firewall On:** Instantly and silently rejects any number on your personal blacklist.
+    - **Zen Mode:** Rejects all calls *except* those on your trusted whitelist. Perfect for zero-distraction focus sessions.
+    - **Firewall Off:** Allows all calls through as normal.
 
-- **Offline & Private by Design:**
-  All call processing happens on your device. Your rules, lists, and call patterns never leave your phone.
+- **Intelligent Rules Management:**
+    - **Persistent Blacklist & Whitelist:** Your rules are saved securely on your device in a Room database, surviving app restarts.
+    - **"Promote & Demote" Logic:** A number can only exist on one list. Adding a number to the whitelist automatically removes it from the blacklist (and vice-versa), ensuring predictable behavior.
+    - **Forgiving "Undo" Action:** Accidentally removed a rule? A `Snackbar` with an "Undo" action provides a safety net, powered by a persistent `isPendingDeletion` flag in the database to handle app closures gracefully.
 
-- **Modern & Lightweight:**
-  A clean, intuitive UI built with Jetpack Compose and Material 3, optimized for efficiency.
+- **State-Aware Activity Log:**
+    - **Proof & Transparency:** View a chronological history of every call the app has blocked, complete with timestamps and the mode it was blocked in.
+    - **Contextual Headers:** The log is beautifully organized with "Today," "Yesterday," and date-based `stickyHeader`s for effortless scanning.
+    - **Smart Actions:** Each log item features a dynamic set of quick actions. "Allow" a number (add to whitelist), "Call Back," or "Add Contact." Actions are intelligently hidden if they are not relevant (e.g., "Add Contact" is hidden if the number is already in your device contacts).
 
-## Roadmap & Planned Features
+- **Robust & Resilient Call Screening:**
+    - **System-Level Integration:** Built with `CallScreeningService` to intercept calls before they ring.
+    - **High-Reliability Architecture:** Engineered to prevent the "stuck network" bug by elevating process priority with a `ForegroundService` during the critical call-rejection window.
+    - **Intelligent Number Normalization:** Uses Google's `libphonenumber` to parse and normalize numbers to the E.164 standard, correctly handling local and international formats to ensure rules are matched reliably.
 
-This project is actively being developed. Our goal is to create the most respectful and powerful call management tool for Android.
+- **Modern & Decoupled Architecture:**
+    - **100% Kotlin & Jetpack Compose:** A fully declarative UI built for performance and state-driven rendering.
+    - **Clean MVVM & UDF:** Follows modern MVVM principles with Unidirectional Data Flow (`Flow`, `StateFlow`).
+    - **Centralized Event Bus:** A generic `UiEventBus` decouples ViewModels from the UI, allowing any feature to request a `Snackbar` or other global UI action without direct dependencies.
+    - **Dependency Injection:** Uses Koin for a clear and maintainable dependency graph.
 
-- [ ] **Intelligent Spam Detection:** Automatically block known spam and scam numbers.
-- [ ] **Automated SMS Replies:**
-      Optionally send an automatic text message when a call is blocked. This will be highly configurable, with support for a general message and custom messages for specific numbers.
-- [ ] **Custom Firewall Rules:** Block calls based on patterns (e.g., hidden or international numbers).
-- [ ] **Firewall Log:** View a history of all the calls your firewall has blocked for you.
-- [ ] **Temporary Pass:** Grant a one-time pass to a blocked number to call you back.
-
-## Installation & Setup
-
-1.  Download the latest APK from the [**Releases Page**](https://github.com/Godzuche/DenD/releases).
-2.  Install the app on your Android device.
-3.  **Crucial Step:** When prompted by Android, set **DenD** as the default **"Caller ID & spam app"**. This allows it to screen calls.
-4.  Start building your firewall rules and enjoy the silence!
+- **Private by Design:**
+  All rule processing and call logging happens entirely on your device. Your contacts, rules, and call patterns never leave your phone.
 
 ## Screenshots
 
-*Coming soon...*
+*Coming soon... The UI is being polished to perfection!*
+
+## Installation & Setup
+
+1.  Download the latest APK from the [**Releases Page**](https://github.com/Godzuche/Dend/releases).
+2.  Install the app on your Android device (Android 10/Q or higher).
+3.  **Crucial Step:** On first launch, the app will guide you to set **Dend** as the default **"Caller ID & spam app"**. This permission is required by Android for the app to screen and manage incoming calls.
+4.  Start building your firewall rules and enjoy the silence!
+
+## Roadmap & Planned Features
+This project is an active exploration of modern Android development.
+
+- [ ] **Custom Firewall Rules:** Block calls based on patterns (e.g., hidden numbers, international numbers).
+- [ ] **Automated SMS Replies:** Optionally send a configurable, automatic text message when a call is blocked.
+- [ ] **Onboarding Flow:** A guided setup experience for new users.
+- [ ] **Intelligent Spam Database Integration:** (Future) Optionally sync with a known spam number database.
 
 ## Contributing
-
-Contributions are welcome and greatly appreciated! From feature ideas to pull requests, every bit helps. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and guidelines.
+This is an open-source project built for learning and solving a real-world problem. Contributions, feature ideas, and pull requests are welcome and greatly appreciated! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## License
+This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
 
-This project is licensed under the **Apache License 2.0**. You are free to use, share, and modify the code, subject to the conditions outlined in the license file. See [LICENSE](LICENSE) for more details.
-
-## Acknowledgements
-
-This project was born from a personal need and brought to life by incredible open-source tools.
-
--   A special thanks to the **Jetpack Compose team at Google**. Their work has made building beautiful, modern Android UIs a true joy.
--   This app is a direct answer to the frustration of being kicked from a game or having a meeting interrupted by a call that also kills the phone's data connection (on non-VoLTE networks). It's dedicated to everyone else who just wants to maintain their focus and their flow.
