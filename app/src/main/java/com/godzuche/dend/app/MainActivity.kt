@@ -87,9 +87,11 @@ class MainActivity : ComponentActivity() {
                 darkTheme = themeSettings.darkTheme,
                 isDynamicThemingEnabled = themeSettings.isDynamicThemingEnabled,
             ) {
-                App(
-                    shouldHideOnboarding = uiState.shouldHideOnboarding,
-                )
+                if (uiState is MainActivityUiState.Success) { // So that the shouldHideOnboarding state will come from success state
+                    App(
+                        shouldHideOnboarding = uiState.shouldHideOnboarding,
+                    )
+                }
             }
         }
     }

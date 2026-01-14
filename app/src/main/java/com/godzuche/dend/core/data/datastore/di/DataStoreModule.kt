@@ -36,7 +36,7 @@ val dataStoreModule = module {
             scope = CoroutineScope(scope.coroutineContext + ioDispatcher),
             produceFile = {
                 androidContext().dataStoreFile(DATA_STORE_FILE_NAME)
-            }
+            },
         )
     }
 }

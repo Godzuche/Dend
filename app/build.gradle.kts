@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
 //    alias(libs.plugins.protobuf)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -41,6 +43,15 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
@@ -81,6 +92,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.ui.text.google.fonts)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -113,6 +127,18 @@ dependencies {
 //    implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-    implementation("io.insert-koin:koin-androidx-compose-navigation")
+    implementation(libs.koin.androidx.compose.navigation)
 //    implementation("io.insert-koin:koin-compose-navigation3") // Experimental
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+//    testImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.room.testing)
+    implementation(libs.androidx.room.paging)
+
+    implementation(libs.googlecode.libphonenumber)
+    implementation(libs.kotlinx.datetime)
+
 }

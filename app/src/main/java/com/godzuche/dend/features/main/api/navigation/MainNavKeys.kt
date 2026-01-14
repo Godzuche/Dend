@@ -4,6 +4,4 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MainNavKey(
-    val showOnboardingSuccessMessage: Boolean,
-): NavKey
+data object MainNavKey: NavKey

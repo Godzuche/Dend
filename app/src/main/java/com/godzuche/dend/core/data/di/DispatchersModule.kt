@@ -7,13 +7,10 @@ import org.koin.dsl.module
 
 val dispatchersModule = module {
 
-    // Replaces @Provides @Dispatcher(IO)
-    // We provide a CoroutineDispatcher and name it using the enum value.
     single<CoroutineDispatcher>(named(DendDispatchers.IO)) {
         Dispatchers.IO
     }
 
-    // Replaces @Provides @Dispatcher(Default)
     single<CoroutineDispatcher>(named(DendDispatchers.Default)) {
         Dispatchers.Default
     }

@@ -13,13 +13,16 @@ import kotlinx.coroutines.flow.stateIn
 class MainActivityViewModel(
     userDataRepository: UserDataRepository,
 ) : ViewModel() {
-    val uiState: StateFlow<MainActivityUiState> = userDataRepository.userPreferencesData.map {
-        MainActivityUiState.Success(it)
-    }.stateIn(
-        scope = viewModelScope,
-        initialValue = MainActivityUiState.Loading,
-        started = SharingStarted.WhileSubscribed(5_000),
-    )
+
+    val uiState: StateFlow<MainActivityUiState> =
+        userDataRepository.userPreferencesData.map { userData ->
+            MainActivityUiState.Success(userData)
+        }.stateIn(
+            scope = viewModelScope,
+            initialValue = MainActivityUiState.Loading,
+            started = SharingStarted.WhileSubscribed(5_000),
+        )
+
 }
 
 sealed interface MainActivityUiState {

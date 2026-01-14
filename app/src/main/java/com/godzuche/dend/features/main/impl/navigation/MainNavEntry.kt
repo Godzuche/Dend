@@ -6,9 +6,7 @@ import com.godzuche.dend.features.main.api.navigation.MainNavKey
 import com.godzuche.dend.features.main.impl.presentation.MainScreen
 
 fun EntryProviderScope<NavKey>.mainScreenEntry() {
-    entry<MainNavKey> { key ->
-        MainScreen(
-            showOnboardingSuccessMessage = key.showOnboardingSuccessMessage,
-        )
+    entry<MainNavKey> {
+        MainScreen()
     }
 }

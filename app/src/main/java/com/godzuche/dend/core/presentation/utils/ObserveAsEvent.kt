@@ -14,6 +14,7 @@ fun <T> ObserveAsEvent(
     flow: Flow<T>,
     key1: Any? = null,
     key2: Any? = null,
+    key3: Any? = null,
     onEvent: suspend (T) -> Unit,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -21,6 +22,7 @@ fun <T> ObserveAsEvent(
         lifecycleOwner.lifecycle,
         key1,
         key2,
+        key3,
     ) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             withContext(Dispatchers.Main.immediate) {

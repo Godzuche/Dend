@@ -39,6 +39,13 @@ class NavigationState(
             listOf(startRoute, topLevelRoute)
         }
 
+    // My Extension
+    val currentStack
+        get() = backStacks[this.topLevelRoute]
+            ?: error("Stack for ${this.topLevelRoute} not found")
+
+    val currentRoute get() = currentStack.last()
+
 }
 
 /**

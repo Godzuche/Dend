@@ -5,6 +5,7 @@ import com.godzuche.dend.app.di.appModule
 import com.godzuche.dend.core.data.datastore.di.dataStoreModule
 import com.godzuche.dend.core.data.di.coroutineScopesModule
 import com.godzuche.dend.core.data.di.dataModule
+import com.godzuche.dend.core.data.di.databaseModule
 import com.godzuche.dend.core.data.di.dispatchersModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -20,6 +21,7 @@ class DendApplication : Application() {
             modules(
                 appModule,
                 dataModule,
+                databaseModule,
                 dispatchersModule,
                 dataStoreModule,
                 coroutineScopesModule,

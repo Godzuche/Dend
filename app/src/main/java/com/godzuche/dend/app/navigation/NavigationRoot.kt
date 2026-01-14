@@ -24,7 +24,7 @@ fun NavigationRoot(
 ) {
     val backStack = rememberNavBackStack(
         if (shouldHideOnboarding) {
-            MainNavKey(showOnboardingSuccessMessage = false)
+            MainNavKey
         } else OnboardingGraphNavKey
     )
 
@@ -40,7 +40,7 @@ fun NavigationRoot(
             onboardingGraphEntry(
                 onOnboardingSuccess = {
                     backStack.remove(OnboardingGraphNavKey)
-                    backStack.add(MainNavKey(showOnboardingSuccessMessage = true))
+                    backStack.add(MainNavKey)
                 },
             )
 
