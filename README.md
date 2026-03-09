@@ -20,7 +20,7 @@
 ## The Problem
 Ever been in a focused work session, an important meeting, or a critical moment in a game, only to have an unwanted call interrupt you? Worse, on many networks, that incoming call can momentarily kill your phone's mobile data connection, disrupting your flow entirely.
 
-Dend was engineered as a robust solution to this exact problem. It's a lightweight, private, and powerful firewall for your calls, ensuring that only the people you trust can make your phone ring.
+Dend was engineered as a robust solution to this exact problem. It's a lightweight, private, and powerful firewall for your calls, ensuring that only the people you trust can make your phone ring at critical times.
 
 ## Features Implemented
 This project showcases a production-ready application built with modern, best-practice Android architecture.
@@ -32,6 +32,10 @@ This project showcases a production-ready application built with modern, best-pr
 
 - **Intelligent Rules Management:**
     - **Persistent Blacklist & Whitelist:** Your rules are saved securely on your device in a Room database, surviving app restarts.
+    - **Easy Creation of Rules:** Rules can be easily added using any of the following
+      - A custom call logs screen built with Jetpack Compose
+      - The user's contacts from their preferred Contact application
+      - Manually entering the phone number and an optional name
     - **"Promote & Demote" Logic:** A number can only exist on one list. Adding a number to the whitelist automatically removes it from the blacklist (and vice-versa), ensuring predictable behavior.
     - **Forgiving "Undo" Action:** Accidentally removed a rule? A `Snackbar` with an "Undo" action provides a safety net, powered by a persistent `isPendingDeletion` flag in the database to handle app closures gracefully.
 
@@ -42,14 +46,18 @@ This project showcases a production-ready application built with modern, best-pr
 
 - **Robust & Resilient Call Screening:**
     - **System-Level Integration:** Built with `CallScreeningService` to intercept calls before they ring.
-    - **High-Reliability Architecture:** Engineered to prevent the "stuck network" bug by elevating process priority with a `ForegroundService` during the critical call-rejection window.
+    - **High-Reliability Architecture:** Engineered for efficiency by elevating process priority with a `ForegroundService` during the critical call-rejection window.
     - **Intelligent Number Normalization:** Uses Google's `libphonenumber` to parse and normalize numbers to the E.164 standard, correctly handling local and international formats to ensure rules are matched reliably.
 
 - **Modern & Decoupled Architecture:**
     - **100% Kotlin & Jetpack Compose:** A fully declarative UI built for performance and state-driven rendering.
-    - **Clean MVVM & UDF:** Follows modern MVVM principles with Unidirectional Data Flow (`Flow`, `StateFlow`).
+    - **Declarative Navigation 3:** Leverages the latest Jetpack Navigation 3 for a state-based navigation model with `BottomSheet` and `NavigationBar`.
+      - **State-Managed Back Stack:** Replaces complex internal managers with a developer-owned `List` of states or `SnapshotStateList`, making deep-linking and state restoration seamless.
+      - **Type-Safe Routing:** Uses serializable Kotlin objects instead of string-based routes, ensuring compile-time safety across the entire navigation graph.
+      - **Adaptive Layouts:** Built-in support for "Scenes," enabling easy transitions between single-pane and multi-pane (list-detail) layouts.
+    - **Clean MVVM & UDF:** Follows modern MVVM principles with Unidirectional Data Flow using `Flow`, `StateFlow`, and `Channel/SharedFlow`.
     - **Centralized Event Bus:** A generic `UiEventBus` decouples ViewModels from the UI, allowing any feature to request a `Snackbar` or other global UI action without direct dependencies.
-    - **Dependency Injection:** Uses Koin for a clear and maintainable dependency graph.
+    - **Dependency Injection:** Uses Koin for a lightweight and maintainable dependency graph.
 
 - **Private by Design:**
   All rule processing and call logging happens entirely on your device. Your contacts, rules, and call patterns never leave your phone.
@@ -68,9 +76,9 @@ This project showcases a production-ready application built with modern, best-pr
 ## Roadmap & Planned Features
 This project is an active exploration of modern Android development.
 
-- [ ] **Custom Firewall Rules:** Block calls based on patterns (e.g., hidden numbers, international numbers).
+- [ ] **Custom Firewall Rules:** Block calls based on patterns (e.g., hidden numbers which is automatically blocked for now, international numbers).
 - [ ] **Automated SMS Replies:** Optionally send a configurable, automatic text message when a call is blocked.
-- [ ] **Onboarding Flow:** A guided setup experience for new users.
+- [x] **Onboarding Flow:** A guided setup experience for new users.
 - [ ] **Intelligent Spam Database Integration:** (Future) Optionally sync with a known spam number database.
 
 ## Contributing
